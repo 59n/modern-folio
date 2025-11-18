@@ -75,7 +75,18 @@ export default async function PostPage({
             })}
           </time>
           <div
-            className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-p:text-gray-300 prose-a:text-white prose-a:underline prose-strong:text-white prose-code:text-gray-300 prose-code:bg-gray-900 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-300"
+            className="prose prose-invert prose-lg max-w-none 
+              prose-headings:text-white prose-headings:font-semibold
+              prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-4
+              prose-a:text-white prose-a:underline hover:prose-a:text-gray-300
+              prose-strong:text-white prose-strong:font-semibold
+              prose-ul:text-gray-300 prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6
+              prose-ol:text-gray-300 prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-6
+              prose-li:text-gray-300 prose-li:my-2
+              prose-code:text-gray-300 prose-code:bg-gray-900 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
+              prose-pre:bg-gray-900 prose-pre:text-gray-300 prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto
+              prose-blockquote:border-l-4 prose-blockquote:border-gray-700 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-400
+              prose-hr:border-gray-800 prose-hr:my-8"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
         </article>
