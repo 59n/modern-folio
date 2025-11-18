@@ -5,6 +5,7 @@ import { siteConfig } from '@/config/site'
 import { getAllPosts, getPostBySlug } from '@/lib/posts'
 import Footer from '@/components/Footer'
 import ClickableTitle from '@/components/ClickableTitle'
+import Attachments from '@/components/Attachments'
 import { remark } from 'remark'
 import remarkHtml from 'remark-html'
 
@@ -74,6 +75,7 @@ export default async function PostPage({
               year: 'numeric',
             })}
           </time>
+
           <div
             className="prose prose-invert prose-lg max-w-none 
               prose-headings:text-white prose-headings:font-semibold
@@ -90,6 +92,11 @@ export default async function PostPage({
               prose-img:rounded-lg prose-img:my-6 prose-img:mx-auto prose-img:shadow-lg"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
+
+          {/* Attachments at bottom (if any) */}
+          {post.attachments && post.attachments.length > 0 && (
+            <Attachments attachments={post.attachments} position="bottom" />
+          )}
         </article>
 
         {siteConfig.footer.enabled && <Footer />}

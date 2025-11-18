@@ -4,6 +4,13 @@ import matter from 'gray-matter'
 
 const postsDirectory = path.join(process.cwd(), 'content/posts')
 
+export interface Attachment {
+  name: string
+  url: string
+  size?: string
+  type?: string
+}
+
 export interface Post {
   slug: string
   filename: string
@@ -12,6 +19,7 @@ export interface Post {
   excerpt: string
   content: string
   tags?: string[]
+  attachments?: Attachment[]
 }
 
 // Create URL-safe slug from filename
@@ -79,6 +87,7 @@ export function getPostBySlug(slug: string): Post | null {
       excerpt: data.excerpt || content.substring(0, 150) + '...',
       content,
       tags: data.tags || [],
+      attachments: data.attachments || [],
     }
   } catch (error) {
     console.error(`Error reading post ${slug}:`, error)
