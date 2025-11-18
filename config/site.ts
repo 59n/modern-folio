@@ -111,19 +111,22 @@ export const siteConfig = {
     excerptLength: 150,
   },
 
-  // Projects
-  projects: {
-    enabled: true,
-    title: 'Projects',
-    description: 'Projects and repositories',
-    githubUser: '59n',
-    sortBy: 'updated', // 'updated' | 'created' | 'stars'
-    perPage: 6, // Projects per page
-    totalFetch: 100, // Total projects to fetch from GitHub
-    showStars: true,
-    showLanguage: true,
-    showUpdatedDate: true,
-  },
+      // Projects
+      projects: {
+        enabled: true,
+        title: 'Projects',
+        description: 'Projects and repositories',
+        githubUser: '59n',
+        sortBy: 'updated', // 'updated' | 'created' | 'stars'
+        perPage: 6, // Projects per page
+        totalFetch: 100, // Total projects to fetch from GitHub
+        cacheTime: 3600, // Cache time in seconds (3600 = 1 hour). Set to 0 to disable caching
+        showStars: true,
+        showLanguage: true,
+        showUpdatedDate: true,
+        // Filter out repos matching these patterns (leave empty array to show all repos)
+        excludePatterns: ['.github'], // Example: ['.github', 'username-username'] to exclude specific patterns
+      },
 
   // Meta
   meta: {

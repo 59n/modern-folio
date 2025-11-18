@@ -26,7 +26,7 @@ async function getAllProjects(): Promise<GitHubRepo[]> {
     const res = await fetch(
       `https://api.github.com/users/${siteConfig.projects.githubUser}/repos?sort=${siteConfig.projects.sortBy}&per_page=${siteConfig.projects.totalFetch}`,
       {
-        next: { revalidate: 3600 }, // Revalidate every hour
+        next: { revalidate: siteConfig.projects.cacheTime || 3600 }, // Revalidate time (default: 1 hour). Set to 0 to disable caching
         headers: {
           'Accept': 'application/vnd.github.v3+json',
         },
@@ -38,8 +38,11 @@ async function getAllProjects(): Promise<GitHubRepo[]> {
     }
 
     const repos: GitHubRepo[] = await res.json()
-    // Filter out forks and return the most recently updated repos
-    return repos.filter(repo => !repo.name.includes('.github') && !repo.name.includes('59n-59n'))
+    // Filter out repos matching exclude patterns
+    return repos.filter(repo => {
+      // Exclude repos that match any of the exclude patterns
+      return !siteConfig.projects.excludePatterns?.some(pattern => repo.name.includes(pattern))
+    })
   } catch (error) {
     console.error('Error fetching projects:', error)
     return []
