@@ -86,7 +86,7 @@ export const siteConfig = {
   // Footer
   footer: {
     enabled: false, // Set to true to show footer
-    showLogo: true,
+    showLogo: false,
     logo: 'Jack', // or any text/emoji
     copyright: {
       year: new Date().getFullYear(),
@@ -150,4 +150,3 @@ export const siteConfig = {
 } as const
 
 export type SiteConfig = typeof siteConfig
-

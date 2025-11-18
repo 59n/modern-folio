@@ -6,6 +6,8 @@ A minimal, dark-themed personal portfolio website built with Next.js 14, TypeScr
 
 **👉 [View Live Demo](https://foliopreview.netlify.app/)**
 
+**🎨 [View Theme Demo](https://foliopreview.netlify.app/demo)** - Preview and switch between 17 different portfolio themes!
+
 ### What You'll See
 
 The live demo showcases all features of the portfolio:
@@ -41,13 +43,22 @@ The live demo showcases all features of the portfolio:
 - "View Live" links for projects with homepages
 - Pagination for multiple pages
 
+**🎨 Theme Demo Page**
+- Preview 17 different portfolio themes
+- See color schemes, typography, and styling
+- Switch between themes instantly
+- Each theme has unique personality and branding
+
 **🎮 Interactive Features**
 - Try the easter eggs mentioned below
 - Test the search and filter functionality
 - Navigate through paginated content
+- Explore different themes on the demo page
 
 ## ✨ Features
 
+- 🎨 **17+ Portfolio Themes** - Choose from multiple pre-configured themes or create your own
+- 🎨 **Theme Demo Page** - Preview all available themes at `/demo`
 - 🎨 **Minimal Dark Theme** - Clean, modern design with fully customizable colors
 - 📝 **Markdown Blog** - Write blog posts in markdown with frontmatter support
 - 📎 **File Attachments** - Attach files (PDFs, ZIPs, documents) to blog posts for guides and resources
@@ -281,6 +292,11 @@ The build output will be in the `.next` directory.
 No environment variables are required. All configuration is done through `config/site.ts`.
 
 ## 🎨 Customization Guide
+
+### Themes
+- **Preview Themes**: Visit `/demo` to see all available themes
+- **Switch Themes**: Copy any theme config file (e.g., `config/steampunk_site.ts`) to `config/site.ts`
+- **Create Custom Theme**: Edit `config/site.ts` with your own colors, labels, and branding
 
 ### Colors & Theme
 Edit `config/site.ts` → `colors` section
