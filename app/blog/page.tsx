@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 }
 
 interface BlogPageProps {
-  searchParams: { page?: string; search?: string; tag?: string; year?: string }
+  searchParams: { page?: string; search?: string; tag?: string; year?: string; hasFiles?: string }
 }
 
 export default function BlogPage({ searchParams }: BlogPageProps) {
@@ -20,6 +20,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
   const searchQuery = searchParams.search || ''
   const selectedTag = searchParams.tag || ''
   const selectedYear = searchParams.year || ''
+  const hasFiles = searchParams.hasFiles || ''
   const currentPage = parseInt(searchParams.page || '1', 10)
   const perPage = siteConfig.blog.postsPerPage
 
@@ -35,7 +36,11 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
     const matchesYear = !selectedYear || 
       new Date(post.date).getFullYear().toString() === selectedYear
     
-    return matchesSearch && matchesTag && matchesYear
+    const matchesHasFiles = !hasFiles || 
+      (hasFiles === 'yes' && post.attachments && post.attachments.length > 0) ||
+      (hasFiles === 'no' && (!post.attachments || post.attachments.length === 0))
+    
+    return matchesSearch && matchesTag && matchesYear && matchesHasFiles
   })
 
   // Paginate
@@ -44,11 +49,12 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
   const endIndex = startIndex + perPage
   const paginatedPosts = filteredPosts.slice(startIndex, endIndex)
 
-  const buildQueryString = (updates: { page?: number; search?: string; tag?: string; year?: string }) => {
+  const buildQueryString = (updates: { page?: number; search?: string; tag?: string; year?: string; hasFiles?: string }) => {
     const params = new URLSearchParams()
     if (updates.search) params.set('search', updates.search)
     if (updates.tag) params.set('tag', updates.tag)
     if (updates.year) params.set('year', updates.year)
+    if (updates.hasFiles) params.set('hasFiles', updates.hasFiles)
     if (updates.page && updates.page > 1) params.set('page', updates.page.toString())
     return params.toString() ? `?${params.toString()}` : ''
   }
@@ -77,6 +83,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
           initialSearch={searchQuery}
           initialTag={selectedTag}
           initialYear={selectedYear}
+          initialHasFiles={hasFiles}
         />
 
         {/* Results Count */}
@@ -148,6 +155,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
                     search: searchQuery || undefined,
                     tag: selectedTag || undefined,
                     year: selectedYear || undefined,
+                    hasFiles: hasFiles || undefined,
                     page: currentPage > 1 ? currentPage - 1 : 1
                   })}`}
                   className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${
@@ -178,6 +186,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
                             search: searchQuery || undefined,
                             tag: selectedTag || undefined,
                             year: selectedYear || undefined,
+                            hasFiles: hasFiles || undefined,
                             page: page > 1 ? page : undefined
                           })}`}
                           className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-300 min-w-[44px] text-center ${
@@ -214,6 +223,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
                     search: searchQuery || undefined,
                     tag: selectedTag || undefined,
                     year: selectedYear || undefined,
+                    hasFiles: hasFiles || undefined,
                     page: currentPage + 1
                   })}`}
                   className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${

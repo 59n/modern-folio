@@ -11,13 +11,15 @@ interface BlogFiltersProps {
   initialSearch?: string
   initialTag?: string
   initialYear?: string
+  initialHasFiles?: string
 }
 
-export default function BlogFilters({ allPosts, initialSearch = '', initialTag = '', initialYear = '' }: BlogFiltersProps) {
+export default function BlogFilters({ allPosts, initialSearch = '', initialTag = '', initialYear = '', initialHasFiles = '' }: BlogFiltersProps) {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState(initialSearch)
   const [selectedTag, setSelectedTag] = useState(initialTag)
   const [selectedYear, setSelectedYear] = useState(initialYear)
+  const [hasFiles, setHasFiles] = useState(initialHasFiles)
   const debounceTimer = useRef<NodeJS.Timeout | null>(null)
 
   // Sync state with URL params when they change
@@ -25,7 +27,8 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
     setSearchQuery(initialSearch)
     setSelectedTag(initialTag)
     setSelectedYear(initialYear)
-  }, [initialSearch, initialTag, initialYear])
+    setHasFiles(initialHasFiles)
+  }, [initialSearch, initialTag, initialYear, initialHasFiles])
 
   // Cleanup debounce timer on unmount
   useEffect(() => {
@@ -40,20 +43,22 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
   const allTags = Array.from(new Set(allPosts.flatMap(post => post.tags || []))).sort()
   const allYears = Array.from(new Set(allPosts.map(post => new Date(post.date).getFullYear().toString()))).sort((a, b) => parseInt(b) - parseInt(a))
 
-  const buildQueryString = (updates: { page?: number; search?: string; tag?: string; year?: string }) => {
+  const buildQueryString = (updates: { page?: number; search?: string; tag?: string; year?: string; hasFiles?: string }) => {
     const params = new URLSearchParams()
     if (updates.search) params.set('search', updates.search)
     if (updates.tag) params.set('tag', updates.tag)
     if (updates.year) params.set('year', updates.year)
+    if (updates.hasFiles) params.set('hasFiles', updates.hasFiles)
     if (updates.page && updates.page > 1) params.set('page', updates.page.toString())
     return params.toString() ? `?${params.toString()}` : ''
   }
 
-  const updateURL = (search: string, tag: string, year: string) => {
+  const updateURL = (search: string, tag: string, year: string, hasFiles: string) => {
     const newQuery = buildQueryString({ 
       search: search || undefined,
       tag: tag || undefined,
       year: year || undefined,
+      hasFiles: hasFiles || undefined,
       page: 1
     })
     router.push(`/blog${newQuery}`)
@@ -78,7 +83,7 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
             
             // Debounce the URL update
             debounceTimer.current = setTimeout(() => {
-              updateURL(value, selectedTag, selectedYear)
+              updateURL(value, selectedTag, selectedYear, hasFiles)
             }, 500) // Wait 500ms after user stops typing
           }}
           onKeyDown={(e) => {
@@ -87,7 +92,7 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
               if (debounceTimer.current) {
                 clearTimeout(debounceTimer.current)
               }
-              updateURL(searchQuery, selectedTag, selectedYear)
+              updateURL(searchQuery, selectedTag, selectedYear, hasFiles)
             }
           }}
           className="w-full rounded-lg border bg-gray-900/40 px-4 py-3 text-sm transition-all duration-300 focus:border-gray-700/50 focus:bg-gray-800/60 focus:outline-none"
@@ -115,7 +120,7 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
               onChange={(e) => {
                 const value = e.target.value
                 setSelectedTag(value)
-                updateURL(searchQuery, value, selectedYear)
+                updateURL(searchQuery, value, selectedYear, hasFiles)
               }}
               className="rounded-lg border bg-gray-900/40 px-3 py-2 text-sm transition-all duration-300 focus:border-gray-700/50 focus:bg-gray-800/60 focus:outline-none"
               style={{
@@ -146,7 +151,7 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
               onChange={(e) => {
                 const value = e.target.value
                 setSelectedYear(value)
-                updateURL(searchQuery, selectedTag, value)
+                updateURL(searchQuery, selectedTag, value, hasFiles)
               }}
               className="rounded-lg border bg-gray-900/40 px-3 py-2 text-sm transition-all duration-300 focus:border-gray-700/50 focus:bg-gray-800/60 focus:outline-none"
               style={{
@@ -163,14 +168,43 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
           </div>
         )}
 
+        {/* Has Files Filter */}
+        <div className="flex items-center gap-2">
+          <label 
+            className="text-sm"
+            style={{ color: siteConfig.colors.text.secondary }}
+          >
+            Has Files:
+          </label>
+          <select
+            value={hasFiles}
+            onChange={(e) => {
+              const value = e.target.value
+              setHasFiles(value)
+              updateURL(searchQuery, selectedTag, selectedYear, value)
+            }}
+            className="rounded-lg border bg-gray-900/40 px-3 py-2 text-sm transition-all duration-300 focus:border-gray-700/50 focus:bg-gray-800/60 focus:outline-none"
+            style={{
+              borderColor: siteConfig.colors.button.border,
+              backgroundColor: siteConfig.colors.button.background,
+              color: siteConfig.colors.text.primary,
+            }}
+          >
+            <option value="">All Posts</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
         {/* Clear Filters */}
-        {(selectedTag || selectedYear || searchQuery) && (
+        {(selectedTag || selectedYear || searchQuery || hasFiles) && (
           <button
             onClick={() => {
               // Clear all state
               setSearchQuery('')
               setSelectedTag('')
               setSelectedYear('')
+              setHasFiles('')
               // Clear any pending debounce
               if (debounceTimer.current) {
                 clearTimeout(debounceTimer.current)
