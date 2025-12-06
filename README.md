@@ -1,6 +1,6 @@
 # Portfolio Website
 
-A minimal, dark-themed personal portfolio website built with Next.js 14, TypeScript, and Tailwind CSS. Inspired by [adryd.com](https://adryd.com/), [prpl.wtf](https://prpl.wtf/), and [matdoes.dev](https://matdoes.dev/).
+A minimal, dark-themed personal portfolio website built with Next.js 16, TypeScript, and Tailwind CSS 4. Inspired by [adryd.com](https://adryd.com/), [prpl.wtf](https://prpl.wtf/), and [matdoes.dev](https://matdoes.dev/).
 
 ## 🎯 Live Demo
 
@@ -75,7 +75,7 @@ The live demo showcases all features of the portfolio:
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 20+ (recommended for Next.js 16)
 - npm, yarn, or pnpm
 
 ### Installation
@@ -251,9 +251,10 @@ Try them out on the [live demo](https://foliopreview.netlify.app/)!
 
 ## 🛠️ Technologies
 
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Utility-first CSS framework
+- **Next.js 16** - React framework with App Router
+- **React 19** - Latest React with improved performance
+- **TypeScript 5.9** - Type safety
+- **Tailwind CSS 4** - Utility-first CSS framework
 - **gray-matter** - Markdown frontmatter parsing
 - **remark** - Markdown processing and HTML conversion
 - **@tailwindcss/typography** - Beautiful typography for markdown content
@@ -364,4 +365,4 @@ Design inspired by:
 
 ---
 
-Built with ❤️ using Next.js and TypeScript
+Built with ❤️ using Next.js 16, React 19, and TypeScript
