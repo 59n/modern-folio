@@ -2,7 +2,7 @@ services:
   app:
     container_name: folio-app
     # Use the pre-built image from GitHub Packages
-    image: ghcr.io/59n/59n-folio-with-backend:latest
+    image: ghcr.io/59n/modern-folio:latest
     # Or build locally:
     # build:
     #   context: .

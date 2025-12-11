@@ -30,8 +30,8 @@ The easiest way to run the app is using Docker. This ensures your database and u
 
 1. **Clone the repository** (or just download the `docker-compose.yml`)
    ```bash
-   git clone https://github.com/59n/59n-folio-with-backend.git
-   cd 59n-folio-with-backend
+   git clone https://github.com/59n/modern-folio.git
+   cd modern-folio
    ```
 
 2. **Setup Environment**
