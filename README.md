@@ -4,6 +4,15 @@ A high-performance, dynamic portfolio template built with Next.js 14, React Serv
 
 ![Preview](https://github.com/59n/modern-folio/assets/preview.png)
 
+## Navigation
+
+- [Features](#features)
+- [Quick Start (Docker)](#quick-start-docker)
+- [Development (Localhost)](#development-localhost)
+- [Admin Setup](#admin-setup)
+- [Customization](#customization)
+- [Troubleshooting](#troubleshooting)
+
 ## Features
 
 - 🚀 **Next.js 14** (App Router)
@@ -13,16 +22,29 @@ A high-performance, dynamic portfolio template built with Next.js 14, React Serv
 - 💾 **SQLite Database** (via Prisma)
 - 🐳 **Docker Ready**
 
-## Getting Started
+## Quick Start (Docker)
 
-### 1. Clone the repository
+This is the recommended way to deploy the application.
 
-```bash
-git clone https://github.com/yourusername/modern-folio.git
-cd modern-folio
-```
+1. **Clone and Enter Directory**:
+   ```bash
+   git clone https://github.com/yourusername/modern-folio.git
+   cd modern-folio
+   ```
 
-### 2. Environment Setup
+2. **Start the Application**:
+   ```bash
+   docker-compose up -d
+   ```
+   The app will start at `http://localhost:3000`.
+
+   *Note: In production, ensure you set a secure `AUTH_SECRET` environment variable.*
+
+## Development (Localhost)
+
+Use this method if you are developing features or modifying the code locally.
+
+### 1. Environment Setup
 
 Create a `.env` file in the root directory:
 
@@ -32,14 +54,12 @@ AUTH_SECRET="super-secret-key-change-this"
 NEXTAUTH_URL="http://localhost:3000"
 ```
 
-### 3. Install & Run
+### 2. Install & Run
 
 ```bash
 npm install
 npm run dev
 ```
-
-The app will start at `http://localhost:3000`.
 
 ## Admin Setup
 
@@ -57,16 +77,6 @@ You can customize the site identity directly from the **Admin > Settings** page:
 - Colors & Themes
 - Social Links
 - Features (Enable/Disable Blog, Projects, etc.)
-
-## Docker Deployment (Production)
-
-This project handles its own Docker setup.
-
-```bash
-docker-compose up -d
-```
-
-Valid `auth_secret` and environment variables should be set in production.
 
 ## Troubleshooting
 
