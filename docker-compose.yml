@@ -2,7 +2,6 @@ services:
   app:
     container_name: folio-app
     image: ghcr.io/59n/modern-folio:latest
-    # user: root # Removed as requested
     restart: always
     ports:
       - "3000:3000"
