@@ -28,7 +28,7 @@ A powerful, self-hosted portfolio and blog platform built with Next.js 16. This 
 
 The easiest way to run the app is using Docker. This ensures your database and uploads are preserved.
 
-1. **Clone the repository**
+1. **Clone the repository** (or just download the `docker-compose.yml`)
    ```bash
    git clone https://github.com/59n/59n-folio-with-backend.git
    cd 59n-folio-with-backend
@@ -42,8 +42,9 @@ The easiest way to run the app is using Docker. This ensures your database and u
 
 3. **Run with Docker Compose**
    ```bash
-   docker-compose up -d --build
+   docker-compose up -d
    ```
+   **Note:** This pulls the pre-built image from GitHub Packages. No build step required!
    
 4. **Access the Site**
    - **Frontend**: http://localhost:3000

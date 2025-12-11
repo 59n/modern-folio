@@ -1,9 +1,12 @@
 services:
   app:
     container_name: folio-app
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # Use the pre-built image from GitHub Packages
+    image: ghcr.io/59n/59n-folio-with-backend:latest
+    # Or build locally:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     restart: always
     ports:
       - "3000:3000"
