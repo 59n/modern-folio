@@ -24,6 +24,9 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npx prisma generate
+# Pass dummy DATABASE_URL for Prisma client validation during build
+ENV DATABASE_URL="file:./build.db"
+
 RUN npm run build
 
 # Production dependencies

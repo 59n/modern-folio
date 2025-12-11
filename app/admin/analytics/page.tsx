@@ -22,6 +22,8 @@ function StatCard({ title, value, subtext }: { title: string, value: string | nu
     );
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function AnalyticsPage() {
     // 1. Fetch Post Stats
     const totalPosts = await prisma.post.count();
