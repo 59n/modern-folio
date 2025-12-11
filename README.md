@@ -2,7 +2,7 @@
 
 A high-performance, dynamic portfolio template built with Next.js 14, React Server Components, and Tailwind CSS. Designed to be fast, beautiful, and easy to manage.
 
-![Preview](https://github.com/59n/modern-folio/assets/preview.png)
+<img width="1893" height="963" alt="NOtYNCoR5cpdpK7c" src="https://github.com/user-attachments/assets/ea4b7650-3adb-4483-93e5-df8c3675f251" />
 
 ## Navigation
 
