@@ -6,14 +6,24 @@ import { prisma } from '@/lib/prisma'
 import Footer from '@/components/Footer'
 import ClickableTitle from '@/components/ClickableTitle'
 import { remark } from 'remark'
-import html from 'remark-html'
+import remarkRehype from 'remark-rehype'
+import rehypeSlug from 'rehype-slug'
+import rehypeStringify from 'rehype-stringify'
+import remarkGfm from 'remark-gfm'
 
 // Helper to convert markdown to html
 async function markdownToHtml(markdown: string) {
   // Remove the first H1 heading if it exists at the start of the content
   // This prevents double titles since we render the title in the page layout
   const cleanMarkdown = markdown.trim().replace(/^#\s+[^\n]+(\n|$)/, '');
-  const result = await remark().use(html).process(cleanMarkdown)
+
+  const result = await remark()
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypeSlug)
+    .use(rehypeStringify)
+    .process(cleanMarkdown)
+
   return result.toString()
 }
 
@@ -106,7 +116,7 @@ export default async function PostPage(props: {
           </header>
 
           <div
-            className="prose prose-invert prose-lg mx-auto max-w-none prose-headings:font-bold prose-headings:text-white prose-p:text-gray-300 prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-code:text-blue-300 prose-pre:bg-gray-900/50 prose-pre:border prose-pre:border-gray-800"
+            className="prose prose-invert prose-lg mx-auto max-w-none prose-headings:font-bold prose-headings:text-white prose-p:text-gray-300 prose-a:text-blue-400 prose-a:no-underline [&_a:hover]:underline prose-code:text-blue-300 prose-pre:bg-gray-900/50 prose-pre:border prose-pre:border-gray-800"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
         </article>
