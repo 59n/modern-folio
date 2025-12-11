@@ -270,15 +270,30 @@ npm run lint     # Run ESLint
 
 ## 🚀 Deployment
 
-### Netlify
+### 🐳 Docker (Recommended)
+This is the easiest way to run the self-hosted version with your own database and file storage.
+1. **Clone the repo:**
+   ```bash
+   git clone https://github.com/59n/59n-folio-with-backend.git
+   cd 59n-folio-with-backend
+   ```
+2. **Setup Environment:**
+   ```bash
+   cp .env.example .env
+   # Edit .env and change AUTH_SECRET to a secure random string
+   ```
+3. **Run with Docker Compose:**
+   ```bash
+   docker-compose up -d --build
+   ```
+   The site will be available at `http://localhost:3000`. 
+   
+   **Default Admin Account:**
+   The first time you run it, you'll need to seed the database or register. Since registration is admin-only, use the seed script or manually insert if needed. 
+   *(Note: The current setup relies on you running `npx prisma db seed` locally or inside the container if it's empty, or using the pre-configured behavior).*
 
-This project is configured for Netlify deployment with `netlify.toml`. Simply:
-
-1. Connect your GitHub repository to Netlify
-2. Netlify will automatically detect Next.js and deploy
-3. No additional configuration needed!
-
-The build command and output directory are already configured in `netlify.toml`.
+### Netlify / Vercel
+**Note:** This version uses a local SQLite database and local file uploads, so it **cannot** be deployed directly to Vercel/Netlify without modification (switching to Postgres + S3). For "One Click" deployment, use the [static version](https://github.com/59n/folio) or modify the database provider.
 
 ### Manual Build
 

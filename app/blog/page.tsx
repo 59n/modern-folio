@@ -1,22 +1,73 @@
-import type { Metadata } from 'next'
 import Link from 'next/link'
-import { siteConfig } from '@/config/site'
-import { getAllPosts } from '@/lib/posts'
+import { getSiteConfig } from '@/lib/settings'
+import { prisma } from '@/lib/prisma'
 import Footer from '@/components/Footer'
 import BlogFilters from '@/components/BlogFilters'
 import ClickableTitle from '@/components/ClickableTitle'
 
-export const metadata: Metadata = {
-  title: siteConfig.meta.titleTemplate.replace('%s', siteConfig.blog.title),
-  description: siteConfig.blog.description,
+export async function generateMetadata() {
+  const siteConfig = await getSiteConfig()
+  return {
+    title: siteConfig.meta.titleTemplate.replace('%s', siteConfig.blog.title),
+    description: siteConfig.blog.description,
+  }
 }
 
-interface BlogPageProps {
-  searchParams: { page?: string; search?: string; tag?: string; year?: string; hasFiles?: string }
+type SearchParams = {
+  search?: string
+  tag?: string
+  year?: string
+  hasFiles?: string
+  page?: string
 }
 
-export default function BlogPage({ searchParams }: BlogPageProps) {
-  const allPosts = getAllPosts()
+interface Attachment {
+  id: string
+  filename: string
+  url: string
+  type: string
+  size: number
+  createdAt: Date
+  postId: string
+}
+
+interface BlogPost {
+  id: string
+  title: string
+  slug: string
+  content: string
+  published: boolean
+  createdAt: Date
+  updatedAt: Date
+  attachments: Attachment[]
+  date: string
+  excerpt: string
+  tags: string[]
+}
+
+export default async function BlogPage(props: {
+  searchParams: Promise<SearchParams>
+}) {
+  const settings = await getSiteConfig(); // Rename to settings to distinguish from type import
+  const siteConfig = settings;
+
+  const searchParams = await props.searchParams;
+
+  // Fetch from DB
+  const dbPosts = await prisma.post.findMany({
+    where: { published: true },
+    orderBy: { createdAt: 'desc' },
+    include: { attachments: true }
+  });
+
+  // Map to existing shape (adhoc adaptation)
+  const allPosts: BlogPost[] = dbPosts.map((p: any) => ({
+    ...p,
+    date: p.createdAt.toISOString(),
+    excerpt: p.content.slice(0, 150) + '...', // Simple excerpt
+    tags: [] as string[], // Placeholder until tags added to DB
+  }));
+
   const searchQuery = searchParams.search || ''
   const selectedTag = searchParams.tag || ''
   const selectedYear = searchParams.year || ''
@@ -25,21 +76,28 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
   const perPage = siteConfig.blog.postsPerPage
 
   // Filter posts
-  const filteredPosts = allPosts.filter(post => {
-    const matchesSearch = !searchQuery || 
+  const filteredPosts = allPosts.filter((post) => {
+    const matchesSearch = !searchQuery ||
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.content.toLowerCase().includes(searchQuery.toLowerCase())
-    
+
     const matchesTag = !selectedTag || post.tags?.includes(selectedTag)
-    
-    const matchesYear = !selectedYear || 
+
+    const matchesYear = !selectedYear ||
       new Date(post.date).getFullYear().toString() === selectedYear
-    
-    const matchesHasFiles = !hasFiles || 
-      (hasFiles === 'yes' && post.attachments && post.attachments.length > 0) ||
-      (hasFiles === 'no' && (!post.attachments || post.attachments.length === 0))
-    
+
+    // Check for files (images or common document links in markdown OR real attachments)
+    const contentHasFiles = /!\[.*?\]\(.*?\)|\[.*?\]\(.*?\.(pdf|zip|doc|docx|xls|xlsx|ppt|pptx)\)/i.test(post.content);
+    const hasAttachments = post.attachments.length > 0;
+
+    let matchesHasFiles = true;
+    if (hasFiles === 'yes') {
+      matchesHasFiles = contentHasFiles || hasAttachments;
+    } else if (hasFiles === 'no') {
+      matchesHasFiles = !contentHasFiles && !hasAttachments;
+    }
+
     return matchesSearch && matchesTag && matchesYear && matchesHasFiles
   })
 
@@ -60,7 +118,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
   }
 
   return (
-    <main 
+    <main
       className="flex min-h-screen items-center justify-center antialiased"
       style={{
         backgroundColor: siteConfig.colors.background,
@@ -69,8 +127,8 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
     >
       <div className="mx-auto w-full max-w-4xl px-6 py-12">
         <div className="mb-12 text-center">
-          <ClickableTitle />
-          <h1 
+          <ClickableTitle siteConfig={siteConfig} />
+          <h1
             className="mb-2 text-2xl font-normal"
             style={{ color: siteConfig.colors.text.secondary }}
           >
@@ -78,7 +136,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
           </h1>
         </div>
 
-        <BlogFilters 
+        <BlogFilters
           allPosts={allPosts}
           initialSearch={searchQuery}
           initialTag={selectedTag}
@@ -88,7 +146,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
 
         {/* Results Count */}
         <div className="mb-6">
-          <p 
+          <p
             className="text-sm"
             style={{ color: siteConfig.colors.text.muted }}
           >
@@ -151,18 +209,17 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
             {totalPages > 1 && (
               <div className="mt-12 flex items-center justify-center gap-4">
                 <Link
-                  href={`/blog${buildQueryString({ 
+                  href={`/blog${buildQueryString({
                     search: searchQuery || undefined,
                     tag: selectedTag || undefined,
                     year: selectedYear || undefined,
                     hasFiles: hasFiles || undefined,
                     page: currentPage > 1 ? currentPage - 1 : 1
                   })}`}
-                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${
-                    currentPage === 1
-                      ? 'cursor-not-allowed opacity-50'
-                      : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
-                  }`}
+                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${currentPage === 1
+                    ? 'cursor-not-allowed opacity-50'
+                    : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
+                    }`}
                   style={{
                     borderColor: siteConfig.colors.button.border,
                     backgroundColor: siteConfig.colors.button.background,
@@ -182,18 +239,17 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
                       return (
                         <Link
                           key={page}
-                          href={`/blog${buildQueryString({ 
+                          href={`/blog${buildQueryString({
                             search: searchQuery || undefined,
                             tag: selectedTag || undefined,
                             year: selectedYear || undefined,
                             hasFiles: hasFiles || undefined,
                             page: page > 1 ? page : undefined
                           })}`}
-                          className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-300 min-w-[44px] text-center ${
-                            page === currentPage
-                              ? 'border-gray-700/50 bg-gray-800/60 text-white'
-                              : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
-                          }`}
+                          className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-300 min-w-[44px] text-center ${page === currentPage
+                            ? 'border-gray-700/50 bg-gray-800/60 text-white'
+                            : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
+                            }`}
                           style={{
                             borderColor: page === currentPage ? siteConfig.colors.button.hover.border : siteConfig.colors.button.border,
                             backgroundColor: page === currentPage ? siteConfig.colors.button.hover.background : siteConfig.colors.button.background,
@@ -219,18 +275,17 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
                 </div>
 
                 <Link
-                  href={`/blog${buildQueryString({ 
+                  href={`/blog${buildQueryString({
                     search: searchQuery || undefined,
                     tag: selectedTag || undefined,
                     year: selectedYear || undefined,
                     hasFiles: hasFiles || undefined,
                     page: currentPage + 1
                   })}`}
-                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${
-                    currentPage === totalPages
-                      ? 'cursor-not-allowed opacity-50'
-                      : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
-                  }`}
+                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${currentPage === totalPages
+                    ? 'cursor-not-allowed opacity-50'
+                    : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
+                    }`}
                   style={{
                     borderColor: siteConfig.colors.button.border,
                     backgroundColor: siteConfig.colors.button.background,
@@ -243,7 +298,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
             )}
 
             <div className="mt-8 text-center">
-              <p 
+              <p
                 className="text-xs"
                 style={{ color: siteConfig.colors.text.muted }}
               >
@@ -262,7 +317,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
           </Link>
         </div>
 
-        {siteConfig.footer.enabled && <Footer />}
+        {siteConfig.footer.enabled && <Footer siteConfig={siteConfig} />}
       </div>
     </main>
   )

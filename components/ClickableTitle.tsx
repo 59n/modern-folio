@@ -1,18 +1,19 @@
 'use client'
 
 import Link from 'next/link'
-import { siteConfig } from '@/config/site'
+import { SiteConfig } from '@/config/site'
 
 interface ClickableTitleProps {
   href?: string
+  siteConfig: SiteConfig
 }
 
-export default function ClickableTitle({ href = '/' }: ClickableTitleProps) {
+export default function ClickableTitle({ href = '/', siteConfig }: ClickableTitleProps) {
   return (
-    <Link 
-      href={href} 
+    <Link
+      href={href}
       className="mb-4 inline-block text-3xl font-normal md:text-4xl transition-colors hover:opacity-80 cursor-pointer"
-      style={{ 
+      style={{
         color: siteConfig.colors.text.primary,
       }}
       onClick={() => {

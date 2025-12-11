@@ -41,3 +41,8 @@ next-env.d.ts
 .vscode/
 .idea/
 
+
+/lib/generated/prisma
+*.db
+*.db-journal
+/public/uploads

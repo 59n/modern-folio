@@ -1,12 +1,17 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { siteConfig } from '@/config/site'
 import Footer from '@/components/Footer'
 import ClickableTitle from '@/components/ClickableTitle'
+import { SiteConfig } from '@/config/site'
 
-export const metadata: Metadata = {
-  title: siteConfig.meta.titleTemplate.replace('%s', siteConfig.projects.title),
-  description: siteConfig.projects.description,
+export async function generateMetadata(): Promise<Metadata> {
+  const { getSiteConfig } = await import('@/lib/settings');
+  const siteConfig = await getSiteConfig();
+
+  return {
+    title: siteConfig.meta.titleTemplate.replace('%s', siteConfig.projects.title),
+    description: siteConfig.projects.description,
+  }
 }
 
 interface GitHubRepo {
@@ -21,7 +26,7 @@ interface GitHubRepo {
   topics: string[]
 }
 
-async function getAllProjects(): Promise<GitHubRepo[]> {
+async function getAllProjects(siteConfig: SiteConfig): Promise<GitHubRepo[]> {
   try {
     const res = await fetch(
       `https://api.github.com/users/${siteConfig.projects.githubUser}/repos?sort=${siteConfig.projects.sortBy}&per_page=${siteConfig.projects.totalFetch}`,
@@ -50,12 +55,15 @@ async function getAllProjects(): Promise<GitHubRepo[]> {
 }
 
 interface ProjectsPageProps {
-  searchParams: { page?: string }
+  searchParams: Promise<{ page?: string }>
 }
 
 export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
-  const allProjects = await getAllProjects()
-  const currentPage = parseInt(searchParams.page || '1', 10)
+  const { getSiteConfig } = await import('@/lib/settings');
+  const siteConfig = await getSiteConfig();
+  const allProjects = await getAllProjects(siteConfig)
+  const params = await searchParams;
+  const currentPage = parseInt(params.page || '1', 10)
   const perPage = siteConfig.projects.perPage
   const totalPages = Math.ceil(allProjects.length / perPage)
   const startIndex = (currentPage - 1) * perPage
@@ -63,7 +71,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const projects = allProjects.slice(startIndex, endIndex)
 
   return (
-    <main 
+    <main
       className="flex min-h-screen items-center justify-center antialiased"
       style={{
         backgroundColor: siteConfig.colors.background,
@@ -72,8 +80,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
     >
       <div className="mx-auto w-full max-w-4xl px-6 py-12">
         <div className="mb-12 text-center">
-          <ClickableTitle />
-          <h1 
+          <ClickableTitle href="/" siteConfig={siteConfig} />
+          <h1
             className="mb-2 text-2xl font-normal"
             style={{ color: siteConfig.colors.text.secondary }}
           >
@@ -103,43 +111,43 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                       <h3 className="text-lg font-medium text-white group-hover:text-white">
                         {project.name}
                       </h3>
-                    {siteConfig.projects.showStars && project.stargazers_count > 0 && (
-                      <span 
-                        className="ml-2 flex items-center gap-1 text-xs"
-                        style={{ color: siteConfig.colors.text.secondary }}
-                      >
-                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                        </svg>
-                        {project.stargazers_count}
-                      </span>
-                    )}
+                      {siteConfig.projects.showStars && project.stargazers_count > 0 && (
+                        <span
+                          className="ml-2 flex items-center gap-1 text-xs"
+                          style={{ color: siteConfig.colors.text.secondary }}
+                        >
+                          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                          </svg>
+                          {project.stargazers_count}
+                        </span>
+                      )}
                     </div>
                     {project.description && (
                       <p className="mb-4 text-sm leading-relaxed text-gray-400">
                         {project.description}
                       </p>
                     )}
-                  <div 
-                    className="flex items-center gap-4 text-xs"
-                    style={{ color: siteConfig.colors.text.muted }}
-                  >
-                    {siteConfig.projects.showLanguage && project.language && (
-                      <span className="flex items-center gap-1">
-                        <span className="h-2 w-2 rounded-full bg-blue-500"></span>
-                        {project.language}
-                      </span>
-                    )}
-                    {siteConfig.projects.showUpdatedDate && (
-                      <span>
-                        Updated {new Date(project.updated_at).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    )}
-                  </div>
+                    <div
+                      className="flex items-center gap-4 text-xs"
+                      style={{ color: siteConfig.colors.text.muted }}
+                    >
+                      {siteConfig.projects.showLanguage && project.language && (
+                        <span className="flex items-center gap-1">
+                          <span className="h-2 w-2 rounded-full bg-blue-500"></span>
+                          {project.language}
+                        </span>
+                      )}
+                      {siteConfig.projects.showUpdatedDate && (
+                        <span>
+                          Updated {new Date(project.updated_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      )}
+                    </div>
                   </a>
                   {project.homepage && (
                     <a
@@ -160,11 +168,10 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               <div className="mt-12 flex items-center justify-center gap-4">
                 <Link
                   href={`/projects${currentPage > 1 ? `?page=${currentPage - 1}` : ''}`}
-                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${
-                    currentPage === 1
+                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${currentPage === 1
                       ? 'cursor-not-allowed opacity-50'
                       : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
-                  }`}
+                    }`}
                   style={{
                     borderColor: currentPage === 1 ? siteConfig.colors.button.border : siteConfig.colors.button.border,
                     backgroundColor: currentPage === 1 ? siteConfig.colors.button.background : siteConfig.colors.button.background,
@@ -187,11 +194,10 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                         <Link
                           key={page}
                           href={`/projects${page > 1 ? `?page=${page}` : ''}`}
-                          className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-300 min-w-[44px] text-center ${
-                            page === currentPage
+                          className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-300 min-w-[44px] text-center ${page === currentPage
                               ? 'border-gray-700/50 bg-gray-800/60 text-white'
                               : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
-                          }`}
+                            }`}
                           style={{
                             borderColor: page === currentPage ? siteConfig.colors.button.hover.border : siteConfig.colors.button.border,
                             backgroundColor: page === currentPage ? siteConfig.colors.button.hover.background : siteConfig.colors.button.background,
@@ -218,11 +224,10 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
                 <Link
                   href={`/projects?page=${currentPage + 1}`}
-                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${
-                    currentPage === totalPages
+                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${currentPage === totalPages
                       ? 'cursor-not-allowed opacity-50'
                       : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
-                  }`}
+                    }`}
                   style={{
                     borderColor: currentPage === totalPages ? siteConfig.colors.button.border : siteConfig.colors.button.border,
                     backgroundColor: currentPage === totalPages ? siteConfig.colors.button.background : siteConfig.colors.button.background,
@@ -236,7 +241,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
             )}
 
             <div className="mt-8 text-center">
-              <p 
+              <p
                 className="text-xs"
                 style={{ color: siteConfig.colors.text.muted }}
               >
@@ -255,7 +260,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           </Link>
         </div>
 
-        {siteConfig.footer.enabled && <Footer />}
+        {siteConfig.footer.enabled && <Footer siteConfig={siteConfig} />}
       </div>
     </main>
   )

@@ -24,8 +24,8 @@ export const siteConfig = {
 
   // Colors & Theme
   colors: {
-    background: '#000000',
-    foreground: '#ffffff',
+    background: 'var(--background)',
+    foreground: 'var(--foreground)',
     card: {
       background: 'rgba(17, 24, 39, 0.4)', // gray-900/40
       border: 'rgba(31, 41, 55, 0.5)', // gray-800/50
@@ -35,9 +35,9 @@ export const siteConfig = {
       },
     },
     text: {
-      primary: '#ffffff',
-      secondary: '#9ca3af', // gray-400
-      muted: '#6b7280', // gray-500
+      primary: 'var(--foreground)',
+      secondary: 'var(--text-secondary)', // We will define this
+      muted: 'var(--text-muted)', // We will define this
     },
     button: {
       background: 'rgba(17, 24, 39, 0.4)',
@@ -46,7 +46,7 @@ export const siteConfig = {
       hover: {
         background: 'rgba(31, 41, 55, 0.6)',
         border: 'rgba(55, 65, 81, 0.5)',
-        text: '#ffffff',
+        text: 'var(--foreground)',
       },
     },
   },
@@ -111,22 +111,22 @@ export const siteConfig = {
     excerptLength: 150,
   },
 
-      // Projects
-      projects: {
-        enabled: true,
-        title: 'Projects',
-        description: 'Projects and repositories',
-        githubUser: '59n',
-        sortBy: 'updated', // 'updated' | 'created' | 'stars'
-        perPage: 6, // Projects per page
-        totalFetch: 100, // Total projects to fetch from GitHub
-        cacheTime: 3600, // Cache time in seconds (3600 = 1 hour). Set to 0 to disable caching
-        showStars: true,
-        showLanguage: true,
-        showUpdatedDate: true,
-        // Filter out repos matching these patterns (leave empty array to show all repos)
-        excludePatterns: ['.github'], // Example: ['.github', 'username-username'] to exclude specific patterns
-      },
+  // Projects
+  projects: {
+    enabled: true,
+    title: 'Projects',
+    description: 'Projects and repositories',
+    githubUser: '59n',
+    sortBy: 'updated', // 'updated' | 'created' | 'stars'
+    perPage: 6, // Projects per page
+    totalFetch: 100, // Total projects to fetch from GitHub
+    cacheTime: 3600, // Cache time in seconds (3600 = 1 hour). Set to 0 to disable caching
+    showStars: true,
+    showLanguage: true,
+    showUpdatedDate: true,
+    // Filter out repos matching these patterns (leave empty array to show all repos)
+    excludePatterns: ['.github'], // Example: ['.github', 'username-username'] to exclude specific patterns
+  },
 
   // Meta
   meta: {

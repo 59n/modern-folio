@@ -8,13 +8,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#000000',
-        foreground: '#ffffff',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [],
 }
 

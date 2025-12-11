@@ -4,10 +4,14 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { siteConfig } from '@/config/site'
-import type { Post } from '@/lib/posts'
+
+interface FilterPost {
+  tags?: string[]
+  date: string
+}
 
 interface BlogFiltersProps {
-  allPosts: Post[]
+  allPosts: FilterPost[]
   initialSearch?: string
   initialTag?: string
   initialYear?: string
@@ -54,7 +58,7 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
   }
 
   const updateURL = (search: string, tag: string, year: string, hasFiles: string) => {
-    const newQuery = buildQueryString({ 
+    const newQuery = buildQueryString({
       search: search || undefined,
       tag: tag || undefined,
       year: year || undefined,
@@ -75,12 +79,12 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
           onChange={(e) => {
             const value = e.target.value
             setSearchQuery(value)
-            
+
             // Clear existing timer
             if (debounceTimer.current) {
               clearTimeout(debounceTimer.current)
             }
-            
+
             // Debounce the URL update
             debounceTimer.current = setTimeout(() => {
               updateURL(value, selectedTag, selectedYear, hasFiles)
@@ -109,7 +113,7 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
         {/* Tag Filter */}
         {allTags.length > 0 && (
           <div className="flex items-center gap-2">
-            <label 
+            <label
               className="text-sm"
               style={{ color: siteConfig.colors.text.secondary }}
             >
@@ -140,7 +144,7 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
         {/* Year Filter */}
         {allYears.length > 0 && (
           <div className="flex items-center gap-2">
-            <label 
+            <label
               className="text-sm"
               style={{ color: siteConfig.colors.text.secondary }}
             >
@@ -170,7 +174,7 @@ export default function BlogFilters({ allPosts, initialSearch = '', initialTag =
 
         {/* Has Files Filter */}
         <div className="flex items-center gap-2">
-          <label 
+          <label
             className="text-sm"
             style={{ color: siteConfig.colors.text.secondary }}
           >

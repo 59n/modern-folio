@@ -1,54 +1,72 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { siteConfig } from '@/config/site'
-import { getAllPosts, getPostBySlug } from '@/lib/posts'
+
+import { prisma } from '@/lib/prisma'
 import Footer from '@/components/Footer'
 import ClickableTitle from '@/components/ClickableTitle'
-import Attachments from '@/components/Attachments'
 import { remark } from 'remark'
-import remarkHtml from 'remark-html'
+import html from 'remark-html'
 
-export async function generateStaticParams() {
-  const posts = getAllPosts()
-  return posts.map((post) => ({
-    slug: post.slug,
-  }))
+// Helper to convert markdown to html
+async function markdownToHtml(markdown: string) {
+  // Remove the first H1 heading if it exists at the start of the content
+  // This prevents double titles since we render the title in the page layout
+  const cleanMarkdown = markdown.trim().replace(/^#\s+[^\n]+(\n|$)/, '');
+  const result = await remark().use(html).process(cleanMarkdown)
+  return result.toString()
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string }
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const post = getPostBySlug(params.slug)
+  const { getSiteConfig } = await import('@/lib/settings');
+  const siteConfig = await getSiteConfig();
+  const params = await props.params;
+  const post = await prisma.post.findUnique({
+    where: { slug: params.slug }
+  });
+
   if (!post) {
     return {
       title: 'Post Not Found',
     }
   }
+
   return {
     title: siteConfig.meta.titleTemplate.replace('%s', post.title),
-    description: post.excerpt,
+    description: post.content.slice(0, 150), // Simple excerpt
   }
 }
 
-export default async function PostPage({
-  params,
-}: {
-  params: { slug: string }
+export default async function PostPage(props: {
+  params: Promise<{ slug: string }>
 }) {
-  const post = getPostBySlug(params.slug)
+  const { getSiteConfig } = await import('@/lib/settings');
+  const siteConfig = await getSiteConfig();
+  const params = await props.params;
+  const post = await prisma.post.findUnique({
+    where: { slug: params.slug },
+    include: { attachments: true }
+  });
 
   if (!post) {
     notFound()
   }
 
-  const processedContent = await remark().use(remarkHtml).process(post.content)
-  const contentHtml = processedContent.toString()
+  const contentHtml = await markdownToHtml(post.content);
+
+  // Adhoc mapping for now
+  const postDate = new Date(post.createdAt).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  const tags = [] as string[]; // Placeholder
 
   return (
-    <main 
+    <main
       className="flex min-h-screen items-center justify-center antialiased"
       style={{
         backgroundColor: siteConfig.colors.background,
@@ -56,52 +74,87 @@ export default async function PostPage({
       }}
     >
       <div className="mx-auto w-full max-w-3xl px-6 py-12">
-        <div className="mb-8">
-          <ClickableTitle href="/blog" />
+        <div className="mb-12 text-center">
+          <ClickableTitle href="/" siteConfig={siteConfig} />
         </div>
 
-        <article className="mb-12">
-          <Link
-            href="/blog"
-            className="mb-6 inline-block text-sm text-gray-400 hover:text-white transition-colors"
-          >
-            ← Back to Blog
-          </Link>
-          <h1 className="mb-4 text-4xl font-normal text-white">{post.title}</h1>
-          <time className="mb-8 block text-sm text-gray-500">
-            {new Date(post.date).toLocaleDateString('en-US', {
-              month: 'long',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </time>
+        <article>
+          <header className="mb-10 text-center">
+            <div className="mb-4 flex items-center justify-center gap-2 text-sm text-gray-500">
+              <time>{postDate}</time>
+            </div>
+            <h1 className="mb-6 text-3xl font-bold leading-tight md:text-4xl text-white">
+              {post.title}
+            </h1>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border px-3 py-1 text-xs"
+                    style={{
+                      borderColor: siteConfig.colors.button.border,
+                      backgroundColor: siteConfig.colors.button.background,
+                      color: siteConfig.colors.text.secondary,
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </header>
 
           <div
-            className="prose prose-invert prose-lg max-w-none 
-              prose-headings:text-white prose-headings:font-semibold
-              prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-4
-              prose-a:text-white prose-a:underline hover:prose-a:text-gray-300
-              prose-strong:text-white prose-strong:font-semibold
-              prose-ul:text-gray-300 prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6
-              prose-ol:text-gray-300 prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-6
-              prose-li:text-gray-300 prose-li:my-2
-              prose-code:text-gray-300 prose-code:bg-gray-900 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
-              prose-pre:bg-gray-900 prose-pre:text-gray-300 prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto
-              prose-blockquote:border-l-4 prose-blockquote:border-gray-700 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-400
-              prose-hr:border-gray-800 prose-hr:my-8
-              prose-img:rounded-lg prose-img:my-6 prose-img:mx-auto prose-img:shadow-lg"
+            className="prose prose-invert prose-lg mx-auto max-w-none prose-headings:font-bold prose-headings:text-white prose-p:text-gray-300 prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-code:text-blue-300 prose-pre:bg-gray-900/50 prose-pre:border prose-pre:border-gray-800"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
-
-          {/* Attachments at bottom (if any) */}
-          {post.attachments && post.attachments.length > 0 && (
-            <Attachments attachments={post.attachments} position="bottom" />
-          )}
         </article>
 
-        {siteConfig.footer.enabled && <Footer />}
+        {/* Attachments Section */}
+        {post.attachments.length > 0 && (
+          <div className="mt-12 border-t border-gray-800 pt-8">
+            <h3 className="text-xl font-semibold mb-4 text-white">Attachments</h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {post.attachments.map((file: { id: string; filename: string; url: string; size: number }) => (
+                <a
+                  key={file.id}
+                  href={file.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-4 rounded-lg border border-gray-800 bg-gray-900/40 hover:bg-gray-800/60 hover:border-gray-700 transition-all group"
+                >
+                  <div className="shrink-0 w-10 h-10 bg-gray-800 rounded flex items-center justify-center text-gray-400 text-xs font-bold uppercase group-hover:bg-gray-700 transition-colors">
+                    {file.filename.split('.').pop()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-200 truncate group-hover:text-white transition-colors">
+                      {file.filename}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-16 border-t border-gray-800 pt-12">
+
+          <div className="text-center">
+            <Link
+              href="/blog"
+              className="inline-block rounded-lg border border-gray-800/50 bg-gray-900/40 px-6 py-2 text-sm font-medium text-gray-300 transition-all duration-300 hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white"
+            >
+              ← Back to Blog
+            </Link>
+          </div>
+        </div>
+
+        {siteConfig.footer.enabled && <Footer siteConfig={siteConfig} />}
       </div>
     </main>
   )
 }
-

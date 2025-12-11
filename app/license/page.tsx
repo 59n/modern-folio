@@ -120,7 +120,7 @@ export default function LicensePage() {
   const licenseText = getLicenseText(licenseType)
 
   return (
-    <main 
+    <main
       className="flex min-h-screen items-center justify-center antialiased"
       style={{
         backgroundColor: siteConfig.colors.background,
@@ -129,7 +129,7 @@ export default function LicensePage() {
     >
       <div className="mx-auto w-full max-w-3xl px-6 py-12">
         <div className="mb-8">
-          <ClickableTitle />
+          <ClickableTitle siteConfig={siteConfig} />
         </div>
 
         <article className="mb-12">
@@ -156,7 +156,7 @@ export default function LicensePage() {
           </div>
         </article>
 
-        {siteConfig.footer.enabled && <Footer />}
+        {siteConfig.footer.enabled && <Footer siteConfig={siteConfig} />}
       </div>
     </main>
   )

@@ -1,0 +1,27 @@
+services:
+  app:
+    container_name: folio-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:/app/data/dev.db
+      - AUTH_SECRET=your_super_secret_auth_secret_change_me_in_prod
+      - NEXTAUTH_URL=http://localhost:3000
+      - AUTH_TRUST_HOST=true
+    volumes:
+      - ./prisma:/app/data
+      - ./public/uploads:/app/public/uploads
+    # Optional: Run migrations on startup. 
+    # Note: 'npx' might not be available in minimal runner image or requires path adjustment.
+    # A safer bet for production is to manual exec or use a startup script.
+    # For this simple setup, we use the default CMD command and assume migrations are applied via host or ephemeral container.
+    # But since we map the DB file, you can run `npx prisma migrate deploy` locally pointing to that file, or validly:
+    # command: sh -c "npx prisma migrate deploy && node server.js" 
+    # (Requires prisma client/cli to be present in final image layers which standalone might prune differently, 
+    # usually better to have these separate or ensure they exist).
+    
+    # We will stick to standard start and assume user handles migration or pre-seeds DB file.
