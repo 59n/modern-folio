@@ -159,45 +159,7 @@ export async function deleteAttachment(attachmentId: string) {
     }
 }
 
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
 
-export async function importPosts() {
-    const postsDirectory = path.join(process.cwd(), 'content/posts');
-    if (!fs.existsSync(postsDirectory)) return;
-
-    const files = fs.readdirSync(postsDirectory);
-
-    for (const filename of files) {
-        if (!filename.endsWith('.md') && !filename.endsWith('.mdx')) continue;
-
-        const filePath = path.join(postsDirectory, filename);
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        const { data, content } = matter(fileContent);
-
-        // Slug from filename or frontmatter
-        const slug = filename.replace(/\.mdx?$/, '');
-
-        await prisma.post.upsert({
-            where: { slug },
-            update: {
-                title: data.title || slug,
-                content: content,
-                published: true,
-                // We could map other fields like date if we added them to schema
-            },
-            create: {
-                slug,
-                title: data.title || slug,
-                content: content,
-                published: true,
-            },
-        });
-    }
-
-    revalidatePath('/admin/posts');
-}
 
 export async function updateTheme(themeId: string) {
     try {

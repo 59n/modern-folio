@@ -12,7 +12,7 @@ export default function ClickableTitle({ href = '/', siteConfig }: ClickableTitl
   return (
     <Link
       href={href}
-      className="mb-4 inline-block text-3xl font-normal md:text-4xl transition-colors hover:opacity-80 cursor-pointer"
+      className="mb-4 inline-block text-2xl font-bold md:text-3xl transition-colors hover:opacity-80 cursor-pointer"
       style={{
         color: siteConfig.colors.text.primary,
       }}

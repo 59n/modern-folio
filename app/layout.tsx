@@ -47,6 +47,10 @@ import { getSiteConfig } from '@/lib/settings'
 
 export const dynamic = 'force-dynamic';
 
+import { Inter } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'] })
+
 export default async function RootLayout({
   children,
 }: {
@@ -89,7 +93,7 @@ export default async function RootLayout({
           '--color-primary': currentTheme.colors.foreground,
           '--color-secondary': currentTheme.colors.foreground,
         } as React.CSSProperties}
-        className="antialiased min-h-screen transition-colors duration-500"
+        className={`${inter.className} antialiased min-h-screen transition-colors duration-500`}
       >
         {children}
         <EasterEgg />

@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { importPosts } from '@/app/lib/actions';
 
 export default async function PostsPage() {
     const posts = await prisma.post.findMany({
@@ -12,11 +11,7 @@ export default async function PostsPage() {
             <div className="flex justify-between items-center mb-8">
                 <h2 className="text-2xl font-bold text-white">Posts</h2>
                 <div className="flex gap-4">
-                    <form action={importPosts}>
-                        <button className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors border border-gray-700">
-                            Import from Files
-                        </button>
-                    </form>
+
                     <Link
                         href="/admin/posts/create"
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors font-medium shadow-lg shadow-blue-900/20"
@@ -74,7 +69,7 @@ export default async function PostsPage() {
                         {posts.length === 0 && (
                             <tr>
                                 <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
-                                    No posts found. Start writing or import existing content!
+                                    No posts found. Start writing!
                                 </td>
                             </tr>
                         )}
