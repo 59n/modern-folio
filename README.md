@@ -109,10 +109,4 @@ Blog posts support file attachments. Authenticated admins can upload files up to
 - **Auth**: NextAuth.js
 - **Deployment**: Docker / Docker Compose
 
-## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-MIT License. Copyright (c) 2024.
