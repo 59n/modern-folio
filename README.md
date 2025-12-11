@@ -41,22 +41,30 @@ The easiest way to run the app is using Docker. This ensures your database and u
    ```
 
 3. **Run with Docker Compose**
+   First, ensure the data directories exist and are writable:
+   ```bash
+   mkdir -p prisma public/uploads
+   chmod 777 prisma public/uploads
+   ```
+   
+   Then start the container:
    ```bash
    docker-compose up -d
    ```
-   **Note:** This pulls the pre-built image from GitHub Packages. No build step required!
    
 4. **Access the Site**
    - **Frontend**: http://localhost:3000
    - **Admin Panel**: http://localhost:3000/admin
 
-### First Time Login
-You will need to create the first admin user. You can do this by running the seed script inside the container:
+### 🔐 First Time Login
+When the container starts for the first time, it will automatically generate a secure admin user.
+Check the logs to find your login credentials:
+
 ```bash
-docker-compose exec app npx prisma db seed
+docker-compose logs app | grep "Admin User Created" -A 10
 ```
-**Default Credentials:** `admin@example.com` / `password123`
-*(Make sure to create a new user and delete this default one immediately!)*
+
+*Save these credentials immediately!*
 
 ---
 

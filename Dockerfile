@@ -53,6 +53,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy prisma schema for migrations
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --chown=nextjs:nodejs docker-entrypoint.sh ./
+
+RUN chmod +x docker-entrypoint.sh
 
 USER nextjs
 
@@ -62,6 +65,5 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["node", "server.js"]
