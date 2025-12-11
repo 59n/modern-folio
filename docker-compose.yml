@@ -12,5 +12,9 @@ services:
       - NEXTAUTH_URL=http://localhost:3000
       - AUTH_TRUST_HOST=true
     volumes:
-      - ./prisma:/app/data
-      - ./public/uploads:/app/public/uploads
+      - db_data:/app/data
+      - uploads_data:/app/public/uploads
+
+volumes:
+  db_data:
+  uploads_data:

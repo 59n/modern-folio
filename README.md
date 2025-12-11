@@ -41,13 +41,6 @@ The easiest way to run the app is using Docker. This ensures your database and u
    ```
 
 3. **Run with Docker Compose**
-   First, ensure the data directories exist and are writable:
-   ```bash
-   mkdir -p prisma public/uploads
-   chmod 777 prisma public/uploads
-   ```
-   
-   Then start the container:
    ```bash
    docker-compose up -d
    ```
