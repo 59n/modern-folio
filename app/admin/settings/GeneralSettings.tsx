@@ -11,7 +11,7 @@ const EmojiPicker = dynamic(() => import('emoji-picker-react'), { ssr: false });
 export default function GeneralSettings({ config }: { config: SiteConfig }) {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [emojiValue, setEmojiValue] = useState<string>(config.footer.emojis);
-    const [faviconVersion, setFaviconVersion] = useState(config.favicon?.version || 0); // Cache buster
+    const [faviconVersion, setFaviconVersion] = useState(config.favicon?.version || 0);
 
     const onEmojiClick = (emojiData: any) => {
         setEmojiValue((prev) => prev + emojiData.emoji);
@@ -20,7 +20,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
     const handleDeleteFavicon = async () => {
         if (confirm('Are you sure you want to remove the custom favicon?')) {
             await deleteFavicon();
-            setFaviconVersion(Date.now()); // Force refresh
+            setFaviconVersion(Date.now());
         }
     };
 
@@ -31,9 +31,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
             setStatus('loading');
             try {
                 await updateSiteConfig(formData);
-                setFaviconVersion(config.favicon?.version || 0); // Re-sync or just assume success
-                // Actually the revalidating path will reload the page props, so config will be fresh.
-                // We just need to update the key to force re-render if needed, but the key is JSON.stringify(config).
+                setFaviconVersion(config.favicon?.version || 0);
 
                 setStatus('success');
                 setTimeout(() => setStatus('idle'), 3000);
@@ -47,14 +45,14 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
 
             {/* ... (keep existing sections) ... */}
 
-            {/* 1. Identity, SEO & Assets */}
+
             <div className="bg-card/50 rounded-xl border border-border/50 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-border/50 bg-secondary/20">
                     <h3 className="text-lg font-semibold text-foreground">Identity & Assets</h3>
                     <p className="text-sm text-muted-foreground">Basic site information and global assets.</p>
                 </div>
                 <div className="p-6 space-y-6">
-                    {/* Text Inputs */}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-muted-foreground">Site Name (Logo Text)</label>
@@ -85,7 +83,6 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                         </div>
                     </div>
 
-                    {/* File Uploads */}
                     <div className="space-y-2 border-t border-border/50 pt-4">
                         <label className="text-sm font-medium text-muted-foreground">Favicon / Site Icon (.ico, .png)</label>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -113,14 +110,14 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                 </div>
             </div>
 
-            {/* 2. Header & Hero */}
+
             <div className="bg-card/50 rounded-xl border border-border/50 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-border/50 bg-secondary/20">
                     <h3 className="text-lg font-semibold text-foreground">Header & Hero</h3>
                     <p className="text-sm text-muted-foreground">Customize the top section of your homepage.</p>
                 </div>
                 <div className="p-6 space-y-8">
-                    {/* Toggles Group */}
+
                     <div className="flex flex-wrap gap-6 p-4 bg-secondary/10 rounded-lg border border-border/30">
                         <label className="text-sm font-medium text-muted-foreground flex items-center gap-2 cursor-pointer group">
                             <Switch name="header_show_social" defaultChecked={config.header.showSocialIcons} />
@@ -128,7 +125,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                         </label>
                     </div>
 
-                    {/* Dropdowns Group (Sizes) */}
+
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="space-y-2">
                             <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Title Size</label>
@@ -180,7 +177,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                         </div>
                     </div>
 
-                    {/* Text Inputs */}
+
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -205,7 +202,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                 </div>
             </div>
 
-            {/* 3. Navigation Links */}
+
             <div className="bg-card/50 rounded-xl border border-border/50 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-border/50 bg-secondary/20">
                     <h3 className="text-lg font-semibold text-foreground">Navigation Bar</h3>
@@ -213,7 +210,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                 </div>
                 <div className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Blog Nav Item */}
+
                         <div className="p-4 rounded-lg border border-border/40 bg-background/50 space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="font-medium">Blog Button</span>
@@ -225,7 +222,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                             </div>
                         </div>
 
-                        {/* Projects Nav Item */}
+
                         <div className="p-4 rounded-lg border border-border/40 bg-background/50 space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="font-medium">Projects Button</span>
@@ -240,7 +237,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                 </div>
             </div>
 
-            {/* 4. Social Links */}
+
             <div className="bg-card/50 rounded-xl border border-border/50 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-border/50 bg-secondary/20">
                     <h3 className="text-lg font-semibold text-foreground">Social Links</h3>
@@ -262,9 +259,9 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                 </div>
             </div>
 
-            {/* 5. Features Config: Blog & Projects */}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Blog Settings */}
+
                 <div className="bg-card/50 rounded-xl border border-border/50 shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-border/50 bg-secondary/20 flex justify-between items-center">
                         <h3 className="text-lg font-semibold text-foreground">Blog Settings</h3>
@@ -284,7 +281,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
                     </div>
                 </div>
 
-                {/* Projects Settings */}
+
                 <div className="bg-card/50 rounded-xl border border-border/50 shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-border/50 bg-secondary/20 flex justify-between items-center">
                         <h3 className="text-lg font-semibold text-foreground">Projects Settings</h3>
@@ -324,7 +321,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
             </div>
 
 
-            {/* 6. Footer */}
+
             <div className="bg-card/50 rounded-xl border border-border/50 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-border/50 bg-secondary/20 flex justify-between items-center">
                     <h3 className="text-lg font-semibold text-foreground">Footer</h3>

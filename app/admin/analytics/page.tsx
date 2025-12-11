@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
-// Simple helper to format bytes
+
 function formatBytes(bytes: number, decimals = 2) {
     if (!+bytes) return '0 Bytes';
     const k = 1024;
@@ -11,7 +11,7 @@ function formatBytes(bytes: number, decimals = 2) {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-// Simple Stat Card Component
+
 function StatCard({ title, value, subtext }: { title: string, value: string | number, subtext?: string }) {
     return (
         <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
@@ -25,26 +25,26 @@ function StatCard({ title, value, subtext }: { title: string, value: string | nu
 export const dynamic = 'force-dynamic';
 
 export default async function AnalyticsPage() {
-    // 1. Fetch Post Stats
+
     const totalPosts = await prisma.post.count();
     const publishedPosts = await prisma.post.count({ where: { published: true } });
     const draftPosts = totalPosts - publishedPosts;
 
-    // 2. Fetch Attachment Stats
+
     const totalAttachments = await prisma.attachment.count();
     const attachmentStats = await prisma.attachment.aggregate({
         _sum: { size: true }
     });
     const totalStorage = attachmentStats._sum.size || 0;
 
-    // 3. Calculate Content Volume (Approximate)
+
     const allPosts = await prisma.post.findMany({
         select: { content: true }
     });
 
     let totalWords = 0;
     allPosts.forEach(post => {
-        // Simple word count: split by spaces
+
         if (post.content) {
             totalWords += post.content.trim().split(/\s+/).length;
         }
@@ -52,7 +52,7 @@ export default async function AnalyticsPage() {
 
     const avgWords = totalPosts > 0 ? Math.round(totalWords / totalPosts) : 0;
 
-    // 4. Recent Activity (Last valid published post date)
+
     const lastPost = await prisma.post.findFirst({
         where: { published: true },
         orderBy: { createdAt: 'desc' },
@@ -73,7 +73,7 @@ export default async function AnalyticsPage() {
                 </div>
             </div>
 
-            {/* Key Metrics Grid */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     title="Total Posts"
@@ -97,14 +97,14 @@ export default async function AnalyticsPage() {
                 />
             </div>
 
-            {/* Deep Dive Sections */}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                 {/* Publishing Status */}
                 <div className="p-8 bg-gray-900/50 rounded-xl border border-gray-800">
                     <h3 className="text-xl font-bold text-white mb-6">Publishing Status</h3>
                     <div className="space-y-4">
-                        {/* Published Bar */}
+
                         <div>
                             <div className="flex justify-between text-sm mb-2">
                                 <span className="text-gray-300">Published</span>
@@ -120,7 +120,7 @@ export default async function AnalyticsPage() {
                             </div>
                         </div>
 
-                        {/* Draft Bar */}
+
                         <div>
                             <div className="flex justify-between text-sm mb-2">
                                 <span className="text-gray-300">Drafts</span>
@@ -138,7 +138,7 @@ export default async function AnalyticsPage() {
                     </div>
                 </div>
 
-                {/* Content Distribution (Placeholder for future) */}
+
                 <div className="p-8 bg-gray-900/50 rounded-xl border border-gray-800 flex flex-col justify-center items-center text-center">
                     <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4">
                         <span className="text-2xl">📊</span>

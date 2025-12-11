@@ -15,7 +15,8 @@ A high-performance, dynamic portfolio template built with Next.js 14, React Serv
 
 ## Features
 
-- 🚀 **Next.js 14** (App Router)
+- 🚀 **Next.js 16** (App Router)
+- ⚛️ **React 19** (Server Components)
 - 💅 **Aceternity UI** & **Tailwind CSS** for styling
 - 📝 **Markdown Blog** with syntax highlighting
 - 🔐 **Admin Dashboard** (CMS) included
@@ -24,7 +25,7 @@ A high-performance, dynamic portfolio template built with Next.js 14, React Serv
 
 ## Quick Start (Docker)
 
-The easiest way to get started is to use the pre-built Docker image. No need to clone the repo!
+The easiest way to get started is to use the pre-built Docker image.
 
 1. **Create a `docker-compose.yml` file**:
    Copy and paste the following content into a new file named `docker-compose.yml`:
@@ -116,6 +117,3 @@ If you see `JWTSessionError` or "no matching decryption secret":
 2. Clear your browser cookies (specifically the `authjs.session-token`).
 3. This often happens when the `AUTH_SECRET` changes between deployments.
 
-## License
-
-MIT

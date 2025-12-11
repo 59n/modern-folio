@@ -306,7 +306,7 @@ export async function updateTheme(themeId: string) {
 
 export async function updateSiteConfig(formData: FormData) {
     try {
-        // Fetch current config to preserve favicon version if not updating
+
         const currentSettings = await prisma.settings.findUnique({
             where: { key: 'site_config' },
         });
@@ -316,7 +316,7 @@ export async function updateSiteConfig(formData: FormData) {
                 const parsed = JSON.parse(currentSettings.value);
                 currentVersion = parsed.favicon?.version || 0;
             } catch (e) {
-                // ignore parse error
+
             }
         }
 
@@ -377,7 +377,7 @@ export async function updateSiteConfig(formData: FormData) {
                 showCopyright: formData.get('footer_show_copyright') === 'on',
                 copyright: {
                     text: formData.get('footer_text') as string,
-                    year: new Date().getFullYear(), // Always current
+                    year: new Date().getFullYear(),
                 },
                 showEmojis: formData.get('footer_show_emojis') === 'on',
                 emojis: formData.get('footer_emojis') as string,
@@ -409,7 +409,7 @@ export async function deleteFavicon() {
         const path = join(process.cwd(), 'public', 'favicon.ico');
         await unlink(path);
 
-        // Update config to force refresh
+
         const currentSettings = await prisma.settings.findUnique({
             where: { key: 'site_config' },
         });
@@ -435,7 +435,7 @@ export async function deleteFavicon() {
         revalidatePath('/', 'layout');
         revalidatePath('/admin/settings');
     } catch (error) {
-        // If file doesn't exist, that's fine, just ignore
+
         if ((error as any).code !== 'ENOENT') {
             console.error('Failed to delete favicon:', error);
             throw new Error('Failed to delete favicon.');

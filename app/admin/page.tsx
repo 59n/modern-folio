@@ -7,12 +7,12 @@ export const dynamic = 'force-dynamic';
 export default async function AdminPage() {
     const session = await auth();
 
-    // Fetch quick stats
+
     const totalPosts = await prisma.post.count();
     const publishedPosts = await prisma.post.count({ where: { published: true } });
     const draftPosts = totalPosts - publishedPosts;
 
-    // Fetch recent posts
+
     const recentPosts = await prisma.post.findMany({
         take: 5,
         orderBy: { createdAt: 'desc' },
@@ -20,7 +20,7 @@ export default async function AdminPage() {
 
     return (
         <div className="space-y-6 max-w-7xl mx-auto">
-            {/* Header */}
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-white">Dashboard</h1>
@@ -35,7 +35,7 @@ export default async function AdminPage() {
                 </Link>
             </div>
 
-            {/* Stats Grid */}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="p-6 bg-gray-900 border border-gray-800 rounded-xl">
                     <h3 className="text-gray-400 text-sm font-medium">Total Content</h3>
@@ -73,7 +73,7 @@ export default async function AdminPage() {
                 </div>
             </div>
 
-            {/* Recent Posts Table */}
+
             <div className="border border-gray-800 rounded-xl overflow-hidden bg-gray-900/50">
                 <div className="px-6 py-4 border-b border-gray-800 flex justify-between items-center">
                     <h3 className="font-semibold text-white">Recent Content</h3>

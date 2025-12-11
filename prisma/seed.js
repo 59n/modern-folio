@@ -32,7 +32,7 @@ async function main() {
         console.log('\n');
     }
 
-    // Seed default posts if none exist
+
     const postCount = await prisma.post.count();
     if (postCount === 0) {
         console.log('Seeding demo posts...');
