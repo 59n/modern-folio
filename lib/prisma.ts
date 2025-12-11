@@ -4,10 +4,11 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 export const prisma =
     globalForPrisma.prisma ||
+    // @ts-ignore
     new PrismaClient({
         datasources: {
             db: {
-                url: process.env.DATABASE_URL || '',
+                url: process.env.DATABASE_URL || 'file:./dev.db',
             },
         },
         log: ['query'],
