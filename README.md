@@ -24,21 +24,42 @@ A high-performance, dynamic portfolio template built with Next.js 14, React Serv
 
 ## Quick Start (Docker)
 
-This is the recommended way to deploy the application.
+The easiest way to get started is to use the pre-built Docker image. No need to clone the repo!
 
-1. **Clone and Enter Directory**:
-   ```bash
-   git clone https://github.com/yourusername/modern-folio.git
-   cd modern-folio
+1. **Create a `docker-compose.yml` file**:
+   Copy and paste the following content into a new file named `docker-compose.yml`:
+
+   ```yaml
+   services:
+     app:
+       container_name: folio-app
+       image: ghcr.io/59n/modern-folio:latest
+       restart: always
+       ports:
+         - "3000:3000"
+       environment:
+         - DATABASE_URL=file:/app/data/dev.db
+         - AUTH_SECRET=your_super_secret_auth_secret_change_me
+         - NEXTAUTH_URL=http://localhost:3000
+         - AUTH_TRUST_HOST=true
+       volumes:
+         - db_data:/app/data
+         - uploads_data:/app/public/uploads
+
+   volumes:
+     db_data:
+     uploads_data:
    ```
 
 2. **Start the Application**:
+   Run this command in the same directory:
    ```bash
    docker-compose up -d
    ```
+   
    The app will start at `http://localhost:3000`.
 
-   *Note: In production, ensure you set a secure `AUTH_SECRET` environment variable.*
+   *Note: In production, ensure you change the `AUTH_SECRET` to a secure random string.*
 
 ## Development (Localhost)
 
