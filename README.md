@@ -1,112 +1,73 @@
-# 59n Portfolio (Dynamic Edition)
+# Modern Portfolio & Blog
 
-A powerful, self-hosted portfolio and blog platform built with Next.js 16. This version includes a full **Admin Dashboard**, **SQLite Database**, and **User Management**, allowing you to manage your content entirely from the web.
+A high-performance, dynamic portfolio template built with Next.js 14, React Server Components, and Tailwind CSS. Designed to be fast, beautiful, and easy to manage.
 
-## ✨ Key Features
+![Preview](https://github.com/59n/modern-folio/assets/preview.png)
 
-### 🚀 Dynamic Core
-- **Database Backed**: Uses SQLite (via Prisma) for robust data storage.
-- **Admin Dashboard**: Full `/admin` panel to manage your site.
-- **File Uploads**: Drag-and-drop file attachments for blog posts.
-- **Analytics**: Built-in content analytics (word counts, post stats).
+## Features
 
-### 🛠 Administrative Control
-- **Content Management**: Create, edit, and delete posts with a rich markdown editor.
-- **User Management**: Invite other admins, manage accounts.
-- **Site Settings**: Configure site title, SEO descriptions, and footer text directly from the dashboard.
-- **Theme Switching**: Toggle between 17+ themes instantly.
+- 🚀 **Next.js 14** (App Router)
+- 💅 **Aceternity UI** & **Tailwind CSS** for styling
+- 📝 **Markdown Blog** with syntax highlighting
+- 🔐 **Admin Dashboard** (CMS) included
+- 💾 **SQLite Database** (via Prisma)
+- 🐳 **Docker Ready**
 
-### 🎨 Beautiful Frontend
-- **Modern Design**: Minimal, dark-themed aesthetics using Tailwind CSS 4.
-- **Markdown Rendering**: Beautiful typography for code blocks, tables, and lists.
-- **Project Showcase**: Automatically fetch and display GitHub repositories.
-- **Search & Filter**: Advanced filtering by tags, year, and attachment availability.
+## Getting Started
 
----
-
-## 🐳 Getting Started (Docker - Recommended)
-
-The easiest way to run the app is using Docker. This ensures your database and uploads are preserved.
-
-1. **Clone the repository** (or just download the `docker-compose.yml`)
-   ```bash
-   git clone https://github.com/59n/modern-folio.git
-   cd modern-folio
-   ```
-
-2. **Setup Environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env and set a secure AUTH_SECRET
-   ```
-
-3. **Run with Docker Compose**
-   ```bash
-   docker-compose up -d
-   ```
-   
-4. **Access the Site**
-   - **Frontend**: http://localhost:3000
-   - **Admin Panel**: http://localhost:3000/admin
-
-### 🔐 First Time Login
-When the container starts for the first time, it will automatically generate a secure admin user.
-Check the logs to find your login credentials:
+### 1. Clone the repository
 
 ```bash
-docker-compose logs app | grep "Admin User Created" -A 10
+git clone https://github.com/yourusername/modern-folio.git
+cd modern-folio
 ```
 
-*Save these credentials immediately!*
+### 2. Environment Setup
 
----
+Create a `.env` file in the root directory:
 
-## 💻 Local Development
+```env
+DATABASE_URL="file:./dev.db"
+AUTH_SECRET="super-secret-key-change-this"
+NEXTAUTH_URL="http://localhost:3000"
+```
 
-If you want to modify the code:
+### 3. Install & Run
 
-1. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+npm run dev
+```
 
-2. **Setup Database**
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   npx prisma db seed
-   ```
+The app will start at `http://localhost:3000`.
 
-3. **Run Dev Server**
-   ```bash
-   npm run dev
-   ```
+## Admin Setup
 
----
+When you first run the application, visit `/admin`. A default admin account will be created if one doesn't exist:
 
-## 📖 Admin Guide
+- **Email**: `admin@example.com`
+- **Password**: (Check your server console logs for the generated password on first run)
 
-### Managed Content
-- **Posts**: Go to **Admin > Posts** to write new articles. You can attach PDF/Zip files directly.
-- **Users**: Go to **Admin > Users** to add new administrators.
-- **Settings**: Go to **Admin > Settings** to change the site name, description, and footer.
+**Important**: Change your credentials immediately after logging in.
 
-### Themes
-The site comes with 17+ pre-configured themes (Cyberpunk, Retro, Dracula, etc.). You can switch the active theme in the **Settings** tab.
+## Customization
 
-### File Attachments
-Blog posts support file attachments. Authenticated admins can upload files up to 10MB (configurable). Files are stored locally in the `public/uploads` directory.
+You can customize the site identity directly from the **Admin > Settings** page:
+- Site Name & Description
+- Colors & Themes
+- Social Links
+- Features (Enable/Disable Blog, Projects, etc.)
 
----
+## Docker Deployment (Production)
 
-## 🛠 Tech Stack
+This project handles its own Docker setup.
 
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS 4
-- **Database**: SQLite (Production-ready file-based DB)
-- **ORM**: Prisma
-- **Auth**: NextAuth.js
-- **Deployment**: Docker / Docker Compose
+```bash
+docker-compose up -d
+```
 
+Valid `auth_secret` and environment variables should be set in production.
 
+## License
+
+MIT

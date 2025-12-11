@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { SiteConfig } from '@/config/site'
-import ClickableTitle from '@/components/ClickableTitle'
 import { Icon } from '@/components/Icons'
+import { useTheme } from '@/components/ThemeProvider'
+import { useEffect, useState } from 'react'
 
-// Define LinkItem type matching the DB model (simplified)
 type LinkItem = {
   id: string;
   title: string;
@@ -16,62 +16,57 @@ type LinkItem = {
   order: number;
 };
 
-// Helper removed, using imported Icon component
-
-
 export default function Header({ siteConfig, links = [] }: { siteConfig: SiteConfig, links?: LinkItem[] }) {
-  const socialLinks = links.filter(l => l.type === 'SOCIAL' && l.active);
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const navLinks = links.filter(l => l.type === 'NAV_ITEM' && l.active);
 
+  // Use theme labels if mounted (client-side), otherwise server config string to avoid mismatch during hydration initially? 
+  // Actually, standard hydration pattern: render server val, then effect updates it. 
+  // Text mismatch warning might occur. We suppress or use 'mounted' check to show generic or server-side.
+  // Ideally, 'blogLabel' changes should be instant. 
+  // We'll use the 'mounted' check to swap to theme label.
+
+  const blogLabel = (mounted && theme.blogLabel) || siteConfig.navigation.blogLabel;
+  const projectsLabel = (mounted && theme.projectsLabel) || siteConfig.navigation.projectsLabel;
+
   return (
-    <header className="mb-16">
-      <ClickableTitle href="/" siteConfig={siteConfig} />
+    <header className="sticky top-0 z-50 w-full backdrop-blur-sm bg-background/80 border-b border-border/50 transition-colors duration-300">
+      <div className="mx-auto flex h-10 max-w-screen-xl items-center justify-between px-4 sm:px-8">
+        <Link href="/" className="font-semibold text-base tracking-tight hover:opacity-80 transition-opacity">
+          {siteConfig.header.title || "Jack"}
+        </Link>
 
-      {/* Social Icons Area - Merging Configured and Custom */}
-      {(siteConfig.header.showSocialIcons || socialLinks.length > 0) && (
-        <div className="mb-8 flex items-center justify-center gap-6 flex-wrap">
-          {/* Social Database Links */}
-          {socialLinks.map(link => (
-            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-all duration-300 hover:scale-110 hover:opacity-80" style={{ color: siteConfig.colors.text.muted }} aria-label={link.title}>
-              <Icon name={link.icon} />
-            </a>
+        <nav className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
+          {siteConfig.navigation.showBlogButton && (
+            <Link href="/blog" className="hover:text-foreground transition-colors">
+              {blogLabel}
+            </Link>
+          )}
+
+          {siteConfig.navigation.showProjectsButton && (
+            <Link href="/projects" className="hover:text-foreground transition-colors">
+              {projectsLabel}
+            </Link>
+          )}
+
+          {navLinks.map(link => (
+            <Link
+              key={link.id}
+              href={link.url}
+              target={link.url.startsWith('http') ? '_blank' : undefined}
+              className="hover:text-foreground transition-colors"
+            >
+              {link.title}
+            </Link>
           ))}
-        </div>
-      )}
-
-      <div className="mb-8 space-y-2 max-w-lg mx-auto">
-        <p className="text-base md:text-lg font-normal leading-relaxed" style={{ color: siteConfig.colors.text.secondary }}>
-          {siteConfig.header.subtitle}
-        </p>
-        <div className="text-base md:text-lg font-normal leading-relaxed" style={{ color: siteConfig.colors.text.secondary }}>
-          {Array.isArray(siteConfig.header.description)
-            ? siteConfig.header.description.map((line, i) => <p key={i}>{line}</p>)
-            : <p>{siteConfig.header.description}</p>
-          }
-        </div>
+        </nav>
       </div>
-
-      {/* Navigation */}
-      <nav className="flex items-center justify-center gap-6 flex-wrap">
-        {siteConfig.navigation.showBlogButton && (
-          <Link href="/blog" className="rounded-xl border px-10 py-4 text-base font-medium transition-all duration-300 hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white min-w-[140px]" style={{ borderColor: siteConfig.colors.button.border, backgroundColor: siteConfig.colors.button.background, color: siteConfig.colors.button.text }}>
-            {siteConfig.navigation.blogLabel}
-          </Link>
-        )}
-
-        {siteConfig.navigation.showProjectsButton && (
-          <Link href="/projects" className="rounded-xl border px-10 py-4 text-base font-medium transition-all duration-300 hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white min-w-[140px]" style={{ borderColor: siteConfig.colors.button.border, backgroundColor: siteConfig.colors.button.background, color: siteConfig.colors.button.text }}>
-            {siteConfig.navigation.projectsLabel}
-          </Link>
-        )}
-
-        {/* Custom Navigation Links */}
-        {navLinks.map(link => (
-          <Link key={link.id} href={link.url} target={link.url.startsWith('http') ? '_blank' : undefined} className="rounded-xl border px-10 py-4 text-base font-medium transition-all duration-300 hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white min-w-[140px]" style={{ borderColor: siteConfig.colors.button.border, backgroundColor: siteConfig.colors.button.background, color: siteConfig.colors.button.text }}>
-            {link.title}
-          </Link>
-        ))}
-      </nav>
     </header>
   )
 }

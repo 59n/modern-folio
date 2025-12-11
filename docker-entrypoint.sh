@@ -3,7 +3,8 @@ set -e
 
 # Run Prisma migrations/push
 echo "Running database setup..."
-./node_modules/.bin/prisma db push
+echo "Skipping generation flag active"
+./node_modules/.bin/prisma db push --skip-generate
 
 # Run seed if needed (the seed script should handle idempotency)
 echo "Seeding database..."

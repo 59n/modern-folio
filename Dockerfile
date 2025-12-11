@@ -54,7 +54,7 @@ RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
 
 # Copy production dependencies to ensure binaries like Prisma are available
-COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=prod-deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing

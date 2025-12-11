@@ -7,41 +7,41 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="flex h-screen bg-black text-white font-sans">
-            <div className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col">
-                <div className="p-6 border-b border-gray-800">
-                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+        <div className="flex h-screen bg-background text-foreground font-sans">
+            <div className="w-64 bg-card border-r border-border flex flex-col">
+                <div className="p-6 border-b border-border">
+                    <h1 className="text-xl font-bold text-foreground">
                         Admin Panel
                     </h1>
                 </div>
                 <nav className="flex-1 p-4 space-y-1">
-                    <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-2">
+                    <p className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-2">
                         Platform
                     </p>
-                    <Link href="/admin" className="block px-4 py-2 text-sm font-medium text-gray-400 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
+                    <Link href="/admin" className="block px-4 py-2 text-sm font-medium text-muted-foreground rounded-lg hover:bg-muted hover:text-foreground transition-colors">
                         Overview
                     </Link>
-                    <Link href="/admin/posts" className="block px-4 py-2 text-sm font-medium text-gray-400 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
+                    <Link href="/admin/posts" className="block px-4 py-2 text-sm font-medium text-muted-foreground rounded-lg hover:bg-muted hover:text-foreground transition-colors">
                         Posts
                     </Link>
-                    <Link href="/admin/analytics" className="block px-4 py-2 text-sm font-medium text-gray-400 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
+                    <Link href="/admin/analytics" className="block px-4 py-2 text-sm font-medium text-muted-foreground rounded-lg hover:bg-muted hover:text-foreground transition-colors">
                         Analytics
                     </Link>
-                    <Link href="/admin/users" className="block px-4 py-2 text-sm font-medium text-gray-400 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
+                    <Link href="/admin/users" className="block px-4 py-2 text-sm font-medium text-muted-foreground rounded-lg hover:bg-muted hover:text-foreground transition-colors">
                         Users
                     </Link>
 
-                    <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-6">
+                    <p className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-6">
                         System
                     </p>
-                    <Link href="/admin/settings" className="block px-4 py-2 text-sm font-medium text-gray-400 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
+                    <Link href="/admin/settings" className="block px-4 py-2 text-sm font-medium text-muted-foreground rounded-lg hover:bg-muted hover:text-foreground transition-colors">
                         Settings
                     </Link>
                 </nav>
-                <div className="p-4 border-t border-gray-800 space-y-2">
+                <div className="p-4 border-t border-border space-y-2">
                     <Link
                         href="/"
-                        className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800/50 rounded-lg hover:bg-gray-800 hover:text-white transition-colors"
+                        className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-muted-foreground bg-muted/50 rounded-lg hover:bg-muted hover:text-foreground transition-colors"
                     >
                         ← Back to Website
                     </Link>
@@ -51,13 +51,13 @@ export default function AdminLayout({
                             await signOut();
                         }}
                     >
-                        <button className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-red-400 bg-red-900/10 rounded-lg hover:bg-red-900/20 transition-colors">
+                        <button className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/20 transition-colors">
                             Sign Out
                         </button>
                     </form>
                 </div>
             </div>
-            <div className="flex-1 overflow-auto bg-black text-gray-100 p-8">
+            <div className="flex-1 overflow-auto bg-background text-foreground p-8">
                 {children}
             </div>
         </div>

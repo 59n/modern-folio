@@ -58,6 +58,10 @@ function mergeConfigs(defaults: SiteConfig, overrides: any): SiteConfig {
         merged.meta = { ...defaults.meta, ...overrides.meta };
     }
 
+    if (overrides.favicon) {
+        merged.favicon = { ...defaults.favicon, ...overrides.favicon };
+    }
+
     return merged;
 }
 
@@ -67,10 +71,14 @@ export async function getSiteConfig(): Promise<SiteConfig> {
             where: { key: 'site_config' },
         });
 
+        let computedConfig = { ...siteConfig };
+
         if (settings?.value) {
             const overrides = JSON.parse(settings.value);
-            return mergeConfigs(siteConfig, overrides);
+            computedConfig = mergeConfigs(computedConfig, overrides);
         }
+
+        return computedConfig;
     } catch (error) {
         console.warn('Failed to fetch site config from DB, using defaults:', error);
     }

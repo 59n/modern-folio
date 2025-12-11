@@ -1,4 +1,4 @@
-import { createLink, deleteLink, toggleLinkActive, updateLinkOrder } from '@/app/lib/actions';
+import { createLink, deleteLink, toggleLinkActive, updateLinkOrder, duplicateLink, deleteAllLinks } from '@/app/lib/actions';
 import { Icon } from '@/components/Icons';
 import SubmitButton from '@/components/SubmitButton';
 import { useOptimistic, useRef, useTransition } from 'react';
@@ -46,6 +46,16 @@ export default function LinkItemsSettings({ links }: { links: LinkItem[] }) {
                     <h3 className="text-xl font-semibold text-white">Custom Links</h3>
                     <p className="text-gray-400 text-sm mt-1">Manage navigation items and social media profiles.</p>
                 </div>
+                {links.length > 0 && (
+                    <form action={deleteAllLinks}>
+                        <button
+                            type="submit"
+                            className="bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-500/20 transition-colors"
+                        >
+                            Delete All
+                        </button>
+                    </form>
+                )}
             </div>
 
             {/* Link List */}
@@ -100,8 +110,17 @@ export default function LinkItemsSettings({ links }: { links: LinkItem[] }) {
                                 <span className={`w-2 h-2 rounded-full ${link.active ? 'bg-green-500' : 'bg-gray-600'}`}></span>
                             </div>
 
+                            <form action={duplicateLink.bind(null, link.id)}>
+                                <button type="submit" className="p-2 text-gray-500 hover:text-blue-400 transition-colors" aria-label="Duplicate">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                    </svg>
+                                </button>
+                            </form>
+
                             <form action={deleteLink.bind(null, link.id)}>
-                                <button type="submit" className="p-2 text-gray-500 hover:text-red-400 transition-colors">
+                                <button type="submit" className="p-2 text-gray-500 hover:text-red-400 transition-colors" aria-label="Delete">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M3 6h18"></path>
                                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>

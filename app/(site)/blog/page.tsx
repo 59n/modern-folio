@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { getSiteConfig } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
+import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import BlogFilters from '@/components/BlogFilters'
-import ClickableTitle from '@/components/ClickableTitle'
 
 export async function generateMetadata() {
   const siteConfig = await getSiteConfig()
@@ -48,24 +48,28 @@ interface BlogPost {
 export default async function BlogPage(props: {
   searchParams: Promise<SearchParams>
 }) {
-  const settings = await getSiteConfig(); // Rename to settings to distinguish from type import
-  const siteConfig = settings;
-
+  const siteConfig = await getSiteConfig();
   const searchParams = await props.searchParams;
 
-  // Fetch from DB
+  // Fetch DB Links for Header
+  const links = await prisma.link.findMany({
+    where: { active: true },
+    orderBy: { order: 'asc' }
+  }).catch(() => []);
+
+
+  // Fetch Posts
   const dbPosts = await prisma.post.findMany({
     where: { published: true },
     orderBy: { createdAt: 'desc' },
     include: { attachments: true }
   });
 
-  // Map to existing shape (adhoc adaptation)
   const allPosts: BlogPost[] = dbPosts.map((p: any) => ({
     ...p,
     date: p.createdAt.toISOString(),
-    excerpt: p.content.slice(0, 150) + '...', // Simple excerpt
-    tags: [] as string[], // Placeholder until tags added to DB
+    excerpt: p.content.slice(0, 150) + '...',
+    tags: [] as string[],
   }));
 
   const searchQuery = searchParams.search || ''
@@ -75,39 +79,30 @@ export default async function BlogPage(props: {
   const currentPage = parseInt(searchParams.page || '1', 10)
   const perPage = siteConfig.blog.postsPerPage
 
-  // Filter posts
+  // Filter logic
   const filteredPosts = allPosts.filter((post) => {
     const matchesSearch = !searchQuery ||
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.content.toLowerCase().includes(searchQuery.toLowerCase())
-
     const matchesTag = !selectedTag || post.tags?.includes(selectedTag)
-
     const matchesYear = !selectedYear ||
       new Date(post.date).getFullYear().toString() === selectedYear
-
-    // Check for files (images or common document links in markdown OR real attachments)
     const contentHasFiles = /!\[.*?\]\(.*?\)|\[.*?\]\(.*?\.(pdf|zip|doc|docx|xls|xlsx|ppt|pptx)\)/i.test(post.content);
     const hasAttachments = post.attachments.length > 0;
-
     let matchesHasFiles = true;
-    if (hasFiles === 'yes') {
-      matchesHasFiles = contentHasFiles || hasAttachments;
-    } else if (hasFiles === 'no') {
-      matchesHasFiles = !contentHasFiles && !hasAttachments;
-    }
-
+    if (hasFiles === 'yes') matchesHasFiles = contentHasFiles || hasAttachments;
+    else if (hasFiles === 'no') matchesHasFiles = !contentHasFiles && !hasAttachments;
     return matchesSearch && matchesTag && matchesYear && matchesHasFiles
   })
 
-  // Paginate
+  // Pagination
   const totalPages = Math.ceil(filteredPosts.length / perPage)
   const startIndex = (currentPage - 1) * perPage
   const endIndex = startIndex + perPage
   const paginatedPosts = filteredPosts.slice(startIndex, endIndex)
 
-  const buildQueryString = (updates: { page?: number; search?: string; tag?: string; year?: string; hasFiles?: string }) => {
+  const buildQueryString = (updates: any) => {
     const params = new URLSearchParams()
     if (updates.search) params.set('search', updates.search)
     if (updates.tag) params.set('tag', updates.tag)
@@ -118,22 +113,13 @@ export default async function BlogPage(props: {
   }
 
   return (
-    <main
-      className="flex min-h-screen items-center justify-center antialiased"
-      style={{
-        backgroundColor: siteConfig.colors.background,
-        color: siteConfig.colors.foreground,
-      }}
-    >
-      <div className="mx-auto w-full max-w-4xl px-6 py-12">
+    <div className="flex min-h-screen flex-col bg-background text-foreground transition-colors duration-300">
+      <Header siteConfig={siteConfig} links={links} />
+
+      <main className="flex-1 w-full max-w-4xl mx-auto px-6 py-12">
         <div className="mb-12 text-center">
-          <ClickableTitle siteConfig={siteConfig} />
-          <h1
-            className="mb-2 text-2xl font-normal"
-            style={{ color: siteConfig.colors.text.secondary }}
-          >
-            {siteConfig.blog.title}
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">{siteConfig.blog.title}</h1>
+          <p className="text-muted-foreground">{siteConfig.blog.description}</p>
         </div>
 
         <BlogFilters
@@ -144,181 +130,119 @@ export default async function BlogPage(props: {
           initialHasFiles={hasFiles}
         />
 
-        {/* Results Count */}
-        <div className="mb-6">
-          <p
-            className="text-sm"
-            style={{ color: siteConfig.colors.text.muted }}
-          >
-            {filteredPosts.length} {filteredPosts.length === 1 ? 'post' : 'posts'} found
-          </p>
+        <div className="mt-8 space-y-8">
+          {paginatedPosts.length === 0 ? (
+            <div className="text-center py-20 text-muted-foreground">
+              No posts found.
+            </div>
+          ) : (
+            paginatedPosts.map(post => (
+              <Link key={post.slug} href={`/blog/${post.slug}`} className="block group">
+                <article className="flex flex-col sm:flex-row gap-4 sm:items-baseline border-b border-border pb-8 hover:opacity-75 transition-opacity">
+                  <time className="text-sm text-muted-foreground sm:w-32 shrink-0 font-mono">
+                    {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </time>
+                  <div>
+                    <h2 className="text-xl font-semibold mb-2 group-hover:underline decoration-1 underline-offset-4">{post.title}</h2>
+                    <p className="text-muted-foreground leading-relaxed text-sm line-clamp-2">{post.excerpt}</p>
+                  </div>
+                </article>
+              </Link>
+            ))
+          )}
         </div>
 
-        {paginatedPosts.length === 0 ? (
-          <div className="text-center text-gray-500">
-            <p>No blog posts found. Try adjusting your filters.</p>
-          </div>
-        ) : (
-          <>
-            <div className="space-y-6">
-              {paginatedPosts.map((post) => (
-                <Link
-                  key={post.slug}
-                  href={`/blog/${post.slug}`}
-                  className="group block"
-                >
-                  <article className="relative overflow-hidden rounded-lg border border-gray-800/50 bg-gray-900/40 p-6 transition-all duration-300 hover:border-gray-700/50 hover:bg-gray-800/60 hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                    <h2 className="mb-2 text-xl font-medium text-white">
-                      {post.title}
-                    </h2>
-                    <div className="mb-3 flex items-center gap-4">
-                      <time className="text-xs text-gray-500">
-                        {new Date(post.date).toLocaleDateString('en-US', {
-                          month: 'long',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
-                      </time>
-                      {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {post.tags.map(tag => (
-                            <span
-                              key={tag}
-                              className="rounded-full border px-2 py-0.5 text-xs"
-                              style={{
-                                borderColor: siteConfig.colors.button.border,
-                                backgroundColor: siteConfig.colors.button.background,
-                                color: siteConfig.colors.text.secondary,
-                              }}
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-sm leading-relaxed text-gray-400">
-                      {post.excerpt}
-                    </p>
-                  </article>
-                </Link>
-              ))}
-            </div>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center items-center gap-2">
+            {/* First & Prev */}
+            <Link
+              href={`/blog${buildQueryString({ ...searchParams, page: 1 })}`}
+              className={`w-10 h-10 flex items-center justify-center rounded-md text-sm font-medium transition-colors ${currentPage > 1 ? 'hover:bg-accent' : 'opacity-50 pointer-events-none'}`}
+              aria-label="First page"
+            >
+              «
+            </Link>
+            <Link
+              href={`/blog${buildQueryString({ ...searchParams, page: currentPage - 1 })}`}
+              className={`w-10 h-10 flex items-center justify-center rounded-md text-sm font-medium transition-colors ${currentPage > 1 ? 'hover:bg-accent' : 'opacity-50 pointer-events-none'}`}
+              aria-label="Previous page"
+            >
+              ‹
+            </Link>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-12 flex items-center justify-center gap-4">
-                <Link
-                  href={`/blog${buildQueryString({
-                    search: searchQuery || undefined,
-                    tag: selectedTag || undefined,
-                    year: selectedYear || undefined,
-                    hasFiles: hasFiles || undefined,
-                    page: currentPage > 1 ? currentPage - 1 : 1
-                  })}`}
-                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${currentPage === 1
-                    ? 'cursor-not-allowed opacity-50'
-                    : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
-                    }`}
-                  style={{
-                    borderColor: siteConfig.colors.button.border,
-                    backgroundColor: siteConfig.colors.button.background,
-                    color: siteConfig.colors.button.text,
-                  }}
-                >
-                  ← Previous
-                </Link>
+            {/* Page Numbers with Ellipsis */}
+            {(() => {
+              const pages = [];
+              // Always show first page
+              pages.push(1);
 
-                <div className="flex items-center gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                    if (
-                      page === 1 ||
-                      page === totalPages ||
-                      (page >= currentPage - 1 && page <= currentPage + 1)
-                    ) {
+              if (currentPage > 3) {
+                pages.push('...');
+              }
+
+              // Show pages around current
+              for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+                pages.push(i);
+              }
+
+              if (currentPage < totalPages - 2) {
+                pages.push('...');
+              }
+
+              // Always show last page if not already added
+              if (totalPages > 1) {
+                pages.push(totalPages);
+              }
+
+              // Deduplicate just in case logic overlaps
+              const uniquePages = [...new Set(pages)];
+
+              return (
+                <div className="flex gap-2 justify-center w-[330px]">
+                  {uniquePages.map((page, index) => {
+                    if (page === '...') {
                       return (
-                        <Link
-                          key={page}
-                          href={`/blog${buildQueryString({
-                            search: searchQuery || undefined,
-                            tag: selectedTag || undefined,
-                            year: selectedYear || undefined,
-                            hasFiles: hasFiles || undefined,
-                            page: page > 1 ? page : undefined
-                          })}`}
-                          className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-300 min-w-[44px] text-center ${page === currentPage
-                            ? 'border-gray-700/50 bg-gray-800/60 text-white'
-                            : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
-                            }`}
-                          style={{
-                            borderColor: page === currentPage ? siteConfig.colors.button.hover.border : siteConfig.colors.button.border,
-                            backgroundColor: page === currentPage ? siteConfig.colors.button.hover.background : siteConfig.colors.button.background,
-                            color: page === currentPage ? siteConfig.colors.button.hover.text : siteConfig.colors.button.text,
-                          }}
-                        >
-                          {page}
-                        </Link>
-                      )
-                    } else if (page === currentPage - 2 || page === currentPage + 2) {
-                      return (
-                        <span
-                          key={page}
-                          className="px-3 text-sm"
-                          style={{ color: siteConfig.colors.text.muted }}
-                        >
+                        <span key={`ellipsis-${index}`} className="w-10 h-10 flex items-center justify-center text-muted-foreground">
                           ...
                         </span>
-                      )
+                      );
                     }
-                    return null
+                    return (
+                      <Link
+                        key={page}
+                        href={`/blog${buildQueryString({ ...searchParams, page })}`}
+                        className={`w-10 h-10 flex items-center justify-center rounded-md text-sm font-medium transition-colors ${page === currentPage ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'
+                          }`}
+                      >
+                        {page}
+                      </Link>
+                    );
                   })}
                 </div>
+              );
+            })()}
 
-                <Link
-                  href={`/blog${buildQueryString({
-                    search: searchQuery || undefined,
-                    tag: selectedTag || undefined,
-                    year: selectedYear || undefined,
-                    hasFiles: hasFiles || undefined,
-                    page: currentPage + 1
-                  })}`}
-                  className={`rounded-lg border px-6 py-2.5 text-sm font-medium transition-all duration-300 min-w-[100px] text-center ${currentPage === totalPages
-                    ? 'cursor-not-allowed opacity-50'
-                    : 'hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white'
-                    }`}
-                  style={{
-                    borderColor: siteConfig.colors.button.border,
-                    backgroundColor: siteConfig.colors.button.background,
-                    color: siteConfig.colors.button.text,
-                  }}
-                >
-                  Next →
-                </Link>
-              </div>
-            )}
-
-            <div className="mt-8 text-center">
-              <p
-                className="text-xs"
-                style={{ color: siteConfig.colors.text.muted }}
-              >
-                Page {currentPage} of {totalPages} • Showing {paginatedPosts.length} of {filteredPosts.length} posts
-              </p>
-            </div>
-          </>
+            {/* Next & Last */}
+            <Link
+              href={`/blog${buildQueryString({ ...searchParams, page: currentPage + 1 })}`}
+              className={`w-10 h-10 flex items-center justify-center rounded-md text-sm font-medium transition-colors ${currentPage < totalPages ? 'hover:bg-accent' : 'opacity-50 pointer-events-none'}`}
+              aria-label="Next page"
+            >
+              ›
+            </Link>
+            <Link
+              href={`/blog${buildQueryString({ ...searchParams, page: totalPages })}`}
+              className={`w-10 h-10 flex items-center justify-center rounded-md text-sm font-medium transition-colors ${currentPage < totalPages ? 'hover:bg-accent' : 'opacity-50 pointer-events-none'}`}
+              aria-label="Last page"
+            >
+              »
+            </Link>
+          </div>
         )}
+      </main>
 
-        <div className="mt-12 text-center">
-          <Link
-            href="/"
-            className="inline-block rounded-lg border border-gray-800/50 bg-gray-900/40 px-6 py-2 text-sm font-medium text-gray-300 transition-all duration-300 hover:border-gray-700/50 hover:bg-gray-800/60 hover:text-white"
-          >
-            ← Back
-          </Link>
-        </div>
-
-        {siteConfig.footer.enabled && <Footer siteConfig={siteConfig} />}
-      </div>
-    </main>
+      {siteConfig.footer.enabled && <Footer siteConfig={siteConfig} />}
+    </div>
   )
 }

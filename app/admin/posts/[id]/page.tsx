@@ -64,6 +64,19 @@ export default async function EditPostPage(props: { params: Promise<{ id: string
                 </div>
 
                 <div>
+                    <label htmlFor="date" className="block text-sm font-medium text-gray-400 mb-2">
+                        Date
+                    </label>
+                    <input
+                        type="datetime-local"
+                        name="date"
+                        id="date"
+                        defaultValue={post.createdAt instanceof Date ? post.createdAt.toISOString().slice(0, 16) : ''}
+                        className="w-full px-4 py-3 bg-gray-950/50 border border-gray-800 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all [color-scheme:dark]"
+                    />
+                </div>
+
+                <div>
                     <label htmlFor="content" className="block text-sm font-medium text-gray-400 mb-2">
                         Content (Markdown)
                     </label>

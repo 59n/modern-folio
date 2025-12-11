@@ -1,28 +1,29 @@
 export const siteConfig = {
   // Site Identity
-  name: 'Jack',
-  title: 'Jack',
-  description: "I'm Jack, I do full-stack software development. This portfolio contains my blog posts and links to some of the projects I've made.",
+  name: 'Portfolio',
+  title: 'My Portfolio',
+  description: "Welcome to my portfolio. I'm a software developer and this is my corner of the internet.",
   author: {
-    name: 'Jack',
-    email: 'jack@thenas.us',
+    name: 'Author Name',
+    email: 'hello@example.com',
   },
 
   // URLs
-  url: 'https://jack.thenas.us',
+  url: 'https://example.com',
   github: {
-    username: '59n',
-    url: 'https://github.com/59n',
+    username: 'username',
+    url: 'https://github.com/username',
   },
 
   // Social Links
   social: {
-    github: 'https://github.com/59n',
-    email: 'jack@thenas.us',
-    solo: 'https://solo.to/btc', // Solo.to profile link
+    github: 'https://github.com/username',
+    email: 'hello@example.com',
+    solo: 'https://solo.to/username', // Solo.to profile link
   },
 
   // Colors & Theme
+  theme: 'system',
   colors: {
     background: 'var(--background)',
     foreground: 'var(--foreground)',
@@ -66,13 +67,15 @@ export const siteConfig = {
 
   // Header
   header: {
-    title: 'Jack',
-    subtitle: "I'm Jack, I do full-stack software development.",
-    description: [
-      "This portfolio contains my blog posts and links to some",
-      "of the projects I've made.",
-    ],
+    title: 'Hello World',
+    subtitle: "I'm a developer building things for the web.",
+    description: `This is my personal portfolio and blog. I write about software development,
+tech, and my journey as a creator.`,
     showSocialIcons: true,
+    titleSize: 'large', // tiny, small, medium, large, extra-large, huge, gigantic
+    subtitleSize: 'medium', // tiny, small, medium, large, extra-large, huge, gigantic
+    descriptionSize: 'small', // tiny, small, medium, large, extra-large, huge, gigantic
+    iconSize: 'medium', // tiny, small, medium, large, extra-large, huge, gigantic
   },
 
   // Navigation
@@ -85,27 +88,28 @@ export const siteConfig = {
 
   // Footer
   footer: {
-    enabled: false, // Set to true to show footer
-    showLogo: false,
-    logo: 'Jack', // or any text/emoji
+    enabled: true, // Set to true to show footer
+    showLogo: true,
+    logo: 'Portfolio', // or any text/emoji
+    showCopyright: true,
     copyright: {
       year: new Date().getFullYear(),
-      text: 'Jack',
+      text: 'Author Name',
       showLicense: false,
       license: {
         type: 'MIT',
         url: '/license',
       },
     },
-    showEmojis: false,
-    emojis: '✨💖💫',
+    showEmojis: true,
+    emojis: '✨ 💻 🚀',
   },
 
   // Blog
   blog: {
     enabled: true,
     title: 'Blog',
-    description: 'Blog posts by Jack',
+    description: 'Thoughts, tutorials, and updates.',
     postsPerPage: 4,
     showExcerpt: true,
     excerptLength: 150,
@@ -115,8 +119,8 @@ export const siteConfig = {
   projects: {
     enabled: true,
     title: 'Projects',
-    description: 'Projects and repositories',
-    githubUser: '59n',
+    description: 'Open source work and experiments.',
+    githubUser: 'vercel', // Default to Vercel as a safe demo
     sortBy: 'updated', // 'updated' | 'created' | 'stars'
     perPage: 6, // Projects per page
     totalFetch: 100, // Total projects to fetch from GitHub
@@ -125,19 +129,19 @@ export const siteConfig = {
     showLanguage: true,
     showUpdatedDate: true,
     // Filter out repos matching these patterns (leave empty array to show all repos)
-    excludePatterns: ['.github'], // Example: ['.github', 'username-username'] to exclude specific patterns
+    excludePatterns: [], // Example: ['.github', 'username-username'] to exclude specific patterns
   },
 
   // Meta
   meta: {
-    defaultTitle: 'Jack',
-    titleTemplate: '%s | Jack',
-    defaultDescription: "I'm Jack, I do full-stack software development.",
+    defaultTitle: 'My Portfolio',
+    titleTemplate: '%s | My Portfolio',
+    defaultDescription: "Welcome to my portfolio.",
     keywords: ['software development', 'web development', 'portfolio', 'blog'],
     ogImage: '/og-image.png',
     twitter: {
       card: 'summary_large_image',
-      site: '@Jack',
+      site: '@username',
     },
   },
 
@@ -146,6 +150,7 @@ export const siteConfig = {
     enabled: true, // Set to true to show favicon
     path: '/favicon.ico',
     appleTouchIcon: '/apple-touch-icon.png',
+    version: 0,
   },
 } as const
 
