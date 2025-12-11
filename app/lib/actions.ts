@@ -134,6 +134,7 @@ export async function deletePost(id: string) {
         console.error('Failed to delete post:', error);
         throw new Error('Failed to delete post.');
     }
+    redirect('/admin/posts');
 }
 
 export async function deleteAttachment(attachmentId: string) {
@@ -152,10 +153,87 @@ export async function deleteAttachment(attachmentId: string) {
             where: { id: attachmentId }
         });
 
-        revalidatePath('/admin/posts');
+        revalidatePath('/admin/posts/[id]', 'page');
     } catch (error) {
         console.error('Failed to delete attachment:', error);
         throw new Error('Failed to delete attachment.');
+    }
+}
+
+// Link Actions
+export async function createLink(formData: FormData) {
+    const title = formData.get('title') as string;
+    const url = formData.get('url') as string;
+    const icon = formData.get('icon') as string || 'link';
+    const type = formData.get('type') as string || 'NAV_ITEM';
+
+    try {
+        // Get the current highest order to append to the end
+        const highestOrderLink = await prisma.link.findFirst({
+            orderBy: { order: 'desc' },
+        });
+        const order = highestOrderLink ? highestOrderLink.order + 1 : 0;
+
+        await prisma.link.create({
+            data: {
+                title,
+                url,
+                icon,
+                type,
+                order,
+            },
+        });
+        revalidatePath('/admin/settings');
+        revalidatePath('/'); // Revalidate home as links might be shown there
+    } catch (error) {
+        console.error('Failed to create link:', error);
+        throw new Error('Failed to create link.');
+    }
+}
+
+export async function deleteLink(id: string) {
+    try {
+        await prisma.link.delete({
+            where: { id },
+        });
+        revalidatePath('/admin/settings');
+        revalidatePath('/');
+    } catch (error) {
+        console.error('Failed to delete link:', error);
+        throw new Error('Failed to delete link.');
+    }
+}
+
+export async function updateLinkOrder(items: { id: string; order: number }[]) {
+    try {
+        // Transaction to update all orders efficiently
+        await prisma.$transaction(
+            items.map((item) =>
+                prisma.link.update({
+                    where: { id: item.id },
+                    data: { order: item.order },
+                })
+            )
+        );
+        revalidatePath('/admin/settings');
+        revalidatePath('/');
+    } catch (error) {
+        console.error('Failed to update link order:', error);
+        throw new Error('Failed to update link order.');
+    }
+}
+
+export async function toggleLinkActive(id: string, active: boolean) {
+    try {
+        await prisma.link.update({
+            where: { id },
+            data: { active },
+        });
+        revalidatePath('/admin/settings');
+        revalidatePath('/');
+    } catch (error) {
+        console.error('Failed to toggle link:', error);
+        throw new Error('Failed to toggle link.');
     }
 }
 

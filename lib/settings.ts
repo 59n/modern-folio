@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import { siteConfig, SiteConfig } from '@/config/site';
+import { siteConfig, type SiteConfig } from '@/config/site';
+export type { SiteConfig };
 
 /**
  * Validates and merges the partial DB config with the default siteConfig.

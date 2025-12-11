@@ -41,3 +41,15 @@ model Settings {
   key   String @id
   value String
 }
+
+model Link {
+  id        String   @id @default(cuid())
+  title     String
+  url       String
+  icon      String   // Icon name
+  type      String   @default("NAV_ITEM") // "NAV_ITEM" or "SOCIAL"
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

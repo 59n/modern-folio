@@ -1,10 +1,10 @@
 FROM node:20-bullseye-slim AS base
 
-# Install dependencies only when needed
-FROM base AS deps
 # Install openssl for Prisma
 RUN apt-get update -y && apt-get install -y openssl
 
+# Install dependencies only when needed
+FROM base AS deps
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
@@ -26,6 +26,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate
 RUN npm run build
 
+# Production dependencies
+FROM base AS prod-deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev
+
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
@@ -46,6 +52,9 @@ RUN chown nextjs:nodejs .next
 # Create data directory for SQLite with correct permissions
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
+
+# Copy production dependencies to ensure binaries like Prisma are available
+COPY --from=prod-deps /app/node_modules ./node_modules
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing

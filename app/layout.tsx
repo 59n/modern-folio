@@ -39,7 +39,9 @@ export const metadata: Metadata = {
     icon: siteConfig.favicon.path,
     apple: siteConfig.favicon.appleTouchIcon,
   },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
 }
+
 
 import { prisma } from '@/lib/prisma'
 import { themes } from '@/lib/themes'
@@ -54,33 +56,33 @@ const inter = Inter({ subsets: ['latin'] })
 export default async function RootLayout({
   children,
 }: {
-  children: ReactNode
+  children: React.ReactNode
 }) {
-  const settings = await getSiteConfig(); // Use for generic stuff if needed, though RootLayout mostly focuses on Theme
+  const globalConfig = await getSiteConfig()
 
-  // Fetch active theme from DB
+  // Fetch active theme structure
   let currentThemeId = 'default'
   try {
-    const themeSettings = await prisma.settings.findUnique({
-      where: { key: 'theme' },
-    })
-    if (themeSettings) {
-      currentThemeId = themeSettings.value
+    const themeSetting = await prisma.settings.findUnique({
+      where: { key: 'theme' }
+    });
+    if (themeSetting?.value) {
+      currentThemeId = themeSetting.value;
     }
   } catch (e) {
-    // Fallback if DB is not ready or accessible
-    console.warn('Failed to fetch theme settings', e)
+    console.warn('Failed to fetch theme', e);
   }
 
-  const currentTheme = themes.find(t => t.id === currentThemeId) || themes[0]
+  // Determine current theme
+  const currentTheme = themes.find(t => t.id === currentThemeId) || themes[0];
 
   return (
     <html lang="en">
       <head>
-        {settings.favicon.enabled && (
+        {globalConfig.favicon.enabled && (
           <>
-            <link rel="icon" href={settings.favicon.path} />
-            <link rel="apple-touch-icon" href={settings.favicon.appleTouchIcon} />
+            <link rel="icon" href={globalConfig.favicon.path} />
+            <link rel="apple-touch-icon" href={globalConfig.favicon.appleTouchIcon} />
           </>
         )}
       </head>
@@ -88,8 +90,8 @@ export default async function RootLayout({
         style={{
           '--background': currentTheme.colors.background,
           '--foreground': currentTheme.colors.foreground,
-          '--text-secondary': currentTheme.colors.foreground + 'b3', // ~70% opacity
-          '--text-muted': currentTheme.colors.foreground + '80', // ~50% opacity
+          '--text-secondary': currentTheme.colors.foreground + 'b3',
+          '--text-muted': currentTheme.colors.foreground + '80',
           '--color-primary': currentTheme.colors.foreground,
           '--color-secondary': currentTheme.colors.foreground,
         } as React.CSSProperties}
@@ -101,4 +103,3 @@ export default async function RootLayout({
     </html>
   )
 }
-

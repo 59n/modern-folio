@@ -5,7 +5,7 @@ import SubmitButton from '@/components/SubmitButton';
 
 export default function CreatePostPage() {
     return (
-        <div className="bg-gray-900/50 backdrop-blur-md border border-gray-800 p-8 rounded-2xl shadow-xl max-w-2xl mx-auto">
+        <div className="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-xl max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold mb-6 text-white">Create New Post</h2>
             <form action={createPost} className="space-y-6">
                 <div>
@@ -42,7 +42,7 @@ export default function CreatePostPage() {
                         id="content"
                         name="content"
                         rows={12}
-                        className="w-full rounded-lg border border-gray-700 bg-gray-800 p-4 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-500"
+                        className="w-full rounded-lg border border-gray-700 bg-gray-800 p-4 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         placeholder="# My Awesome Post..."
                         required
                     />
