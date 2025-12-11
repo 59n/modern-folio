@@ -2,8 +2,8 @@ FROM node:20-bullseye-slim AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-# Install openssl for Prisma
-RUN apt-get update -y && apt-get install -y openssl
+# Install openssl for Prisma and build tools for native modules (better-sqlite3)
+RUN apt-get update -y && apt-get install -y openssl python3 make g++
 
 WORKDIR /app
 
