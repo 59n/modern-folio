@@ -97,7 +97,6 @@ When you first run the application, visit `/admin`. A default admin account will
 You can customize the site identity directly from the **Admin > Settings** page:
 - Site Name & Description
 - Colors & Themes
-- Social Links
 - Features (Enable/Disable Blog, Projects, etc.)
 
 ## Troubleshooting

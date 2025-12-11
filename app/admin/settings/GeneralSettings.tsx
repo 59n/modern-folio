@@ -238,26 +238,7 @@ export default function GeneralSettings({ config }: { config: SiteConfig }) {
             </div>
 
 
-            <div className="bg-card/50 rounded-xl border border-border/50 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-border/50 bg-secondary/20">
-                    <h3 className="text-lg font-semibold text-foreground">Social Links</h3>
-                    <p className="text-sm text-muted-foreground">Your social media profiles.</p>
-                </div>
-                <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">GitHub URL</label>
-                        <input name="social_github" defaultValue={config.social.github} className="w-full bg-secondary/50 border border-border rounded px-3 py-2 text-foreground focus:border-primary outline-none focus:ring-1 focus:ring-primary/50 transition-all" />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">Solo.to URL</label>
-                        <input name="social_solo" defaultValue={config.social.solo} className="w-full bg-secondary/50 border border-border rounded px-3 py-2 text-foreground focus:border-primary outline-none focus:ring-1 focus:ring-primary/50 transition-all" />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">Contact Email</label>
-                        <input name="social_email" defaultValue={config.social.email} className="w-full bg-secondary/50 border border-border rounded px-3 py-2 text-foreground focus:border-primary outline-none focus:ring-1 focus:ring-primary/50 transition-all" />
-                    </div>
-                </div>
-            </div>
+
 
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

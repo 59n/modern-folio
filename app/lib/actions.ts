@@ -11,7 +11,8 @@ export async function authenticate(
     formData: FormData,
 ) {
     try {
-        await signIn('credentials', formData);
+        const loginData = Object.fromEntries(formData);
+        await signIn('credentials', { ...loginData, redirectTo: '/admin' });
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
