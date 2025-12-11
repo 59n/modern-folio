@@ -68,6 +68,23 @@ docker-compose up -d
 
 Valid `auth_secret` and environment variables should be set in production.
 
+## Troubleshooting
+
+### Resetting the Database
+If you want to clear all data and start fresh (e.g. to remove old demo content):
+
+```bash
+docker-compose down -v
+docker-compose up -d --build
+```
+*Note: The `-v` flag deletes the persistent data volumes.*
+
+### Auth Errors
+If you see `JWTSessionError` or "no matching decryption secret":
+1. Ensure `AUTH_SECRET` is set in your environment.
+2. Clear your browser cookies (specifically the `authjs.session-token`).
+3. This often happens when the `AUTH_SECRET` changes between deployments.
+
 ## License
 
 MIT
