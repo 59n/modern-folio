@@ -15,7 +15,7 @@
     "bcryptjs": "^3.0.3",
     "emoji-picker-react": "^4.16.1",
     "gray-matter": "^4.0.3",
-    "next": "^16.0.9",
+    "next": "^16.0.10",
     "next-auth": "^5.0.0-beta.30",
     "prisma": "^5.22.0",
     "react": "^19.2.2",
